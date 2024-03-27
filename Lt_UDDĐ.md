@@ -33,7 +33,15 @@ Gồm 2 thành phần
 Tạo nút
 
 Khai báo control
-- `Textview [tên control];`
-- `Button [Têm nút];`
+```
+Textview [tên text];
+# Textview text1;
 
-Ánh xạ
+Button [tên nút];
+# Button btn1;
+```
+
+Ánh xạ các widget từ Layout vào code Java
+```
+[tên ]
+```
