@@ -31,3 +31,11 @@ Gồm 2 thành phần
 - File code java(kotlin)
 
 ==> Ứng dụng Android quản lý bằng các màn hình
+#### Tương tác với màn hình
+Tạo nút
+
+Khai báo control
+- `Textview [tên control];`
+- `Button [Têm nút];`
+
+Ánh xạ
