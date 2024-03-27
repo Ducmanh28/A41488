@@ -16,3 +16,10 @@ gradle: chứa các thư viện cần đồng bộ từ server
 android manifest.xml: file cấu hình
 
 ### Tạo ứng dụng
+Lưu ý: Bắt buộc phải có mạng
+
+Yêu cầu: 
+- RAM 16GB, Hoặc 8GB + điện thoại Android
+- Chip I5 đời 10 trở lên
+- Máy Win10 hoặc 11 Tiếng Anh        
+
