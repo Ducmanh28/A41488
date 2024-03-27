@@ -22,4 +22,12 @@ Yêu cầu:
 - RAM 16GB, Hoặc 8GB + điện thoại Android
 - Chip I5 đời 10 trở lên
 - Máy Win10 hoặc 11 Tiếng Anh        
+- Tên thư mục không có dấu cách, không dùng tiếng Việt
 
+
+### Activity(Màn hình)
+Gồm 2 thành phần
+- File giao diện: xml(nằm trong thư mục layout)
+- File code java(kotlin)
+
+==> Ứng dụng Android quản lý bằng các màn hình
