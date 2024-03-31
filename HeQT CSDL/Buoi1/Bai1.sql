@@ -80,4 +80,3 @@ update tblPHIM set TEN_PHIM = 'Cướp Biển Carribe' where TEN_PHIM = 'Xác Ư
 select * from tblPHIM
 go
 
-gh
