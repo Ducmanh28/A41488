@@ -79,3 +79,5 @@ go
 update tblPHIM set TEN_PHIM = 'Cướp Biển Carribe' where TEN_PHIM = 'Xác Ướp Ai Cập';
 select * from tblPHIM
 go
+
+gh
