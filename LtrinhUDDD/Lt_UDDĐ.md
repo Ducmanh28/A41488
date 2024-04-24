@@ -32,7 +32,7 @@ Gồm 2 thành phần
 #### Tương tác với màn hình
 Tạo nút
 
-Khai báo control
+Khai báo control. Các biến sẽ được khai báo ở Public Class
 ```
 Textview [tên text];
 # Textview text1;
@@ -41,7 +41,7 @@ Button [tên nút];
 # Button btn1;
 ```
 
-Ánh xạ các widget từ Layout vào code Java
+Ánh xạ các widget từ Layout vào code Java. Ánh xạ ở hàm onCreate
 ```
-[tên ]
+[tên text]=findViewById(R.id.demo)
 ```
