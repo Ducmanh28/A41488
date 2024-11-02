@@ -1,0 +1,146 @@
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Double Rich</title>
+        <style>
+            body{
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 18px;
+                padding: 0;
+                margin: 0;
+            }
+            .header{
+                font-size: 20px;
+                color: white;
+                text-align: right;
+                font-weight: bold;
+                background-color: red;
+                padding: 10px;
+                height: 30px;
+            }
+            .title{
+                font-size: 40px;
+                color: red;
+                text-align: center;
+                padding: 10px;
+                font-weight: bold;
+                height: 60px;
+                background-color: rgb(255, 181, 176);
+                border: 2px solid red;
+            }
+            .container {
+            display: flex;
+            padding: 0;
+            gap: 0;
+            }
+            .left, .right {
+                width: 50%;
+                padding: 0;
+                border: 2px solid red;
+            }
+            .ul1 > ul{
+                font-size: 20px;
+                font-weight: bold;
+                color: red;
+                list-style-type:none;
+            }
+            .ul1 > ul > li{
+                position: relative;
+                padding-left: 25px; /* khoảng cách cho bullet */
+                margin-bottom: 10px; /* khoảng cách giữa các dòng */
+            }
+            .ul1 > ul > li::before{
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 5px;
+                width: 12px;
+                height: 12px;
+                background-color: white;
+                border: 2px solid red;
+                border-radius: 2px; /* Giữ hình dạng vuông */
+                box-sizing: border-box;
+            }
+            .ul2{
+                color: black;
+                list-style-type: disc;
+                font-weight: normal;
+            }
+            ol{
+                color: black;
+                font-weight: normal;
+            }
+            .footer {
+                background-color: #FFD3D3;
+                text-align: center;
+                padding: 10px;
+            }
+            .image{
+                position:absolute;
+                top: 0px;
+                right: 0px;
+                width: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <img align="right" src="D:/cnWeb/double rich.jpg" width="150px" height="150px">
+            <div class="header">Công nghệ dầu gội dưỡng tóc mới</div>
+            <br>
+            <div class="title">Toả sáng cùng DOUBLE RICH</div>
+        </div>
+        <div class="container">
+            <div class="left">
+                <div class="ul1">
+                    <ul>
+                        <li>Sản phẩm khuyến mãi</li>
+                        <br>
+                        <div>
+                            <ul class="ul2">
+                                <li> Dầu gội Double Rich mới 200ml, 400ml có tem khuyến mãi</li>
+                            </ul>
+                            <br>
+                        </div>
+                        <li>Đối tượng tham gia</li>
+                        <br>
+                        <div>
+                            <ul class="ul2">
+                                <li>Áp dụng cho tất cả người tiêu dùng cuối cùng mua sản phẩm khuyến mãi</li>
+                                <li>Chương trình không áp dụng cho nhân viên, nhà phân phối bao gồm các tổng đại lý, 
+                                    đại lý, cửa hàng bán sĩ, lẻ và các cá nhân kinh doanh sản phẩm của công ty LDMP LG Vina, 
+                                    công ty quảng cáo, công ty làm dịch vụ chương trình khuyến mãi này, nhân viên siêu thị
+                                </li>
+                            </ul> 
+                        </div>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="right">
+                <div class="ul1">
+                    <ul>
+                        <li>Cách thức nhận giải</li>
+                        <br>
+                        <div>
+                            <ol>
+                                <li><span style="font-style: italic; font-weight: bold;">Giải khuyến khích</span> : Khách hàng đổi quà tại các cửa hàng bán lẻ trên toàn quốc.
+                                Bắt đầu từ ngày 15/6/2005 đến 17h ngày 12/8/2005 
+                                </li>
+                                <br>
+                                <li>
+                                    <span  style="font-style: italic; font-weight: bold;">Giải đặc biệt, nhất, nhì </span>: khách hàng cắt phần mã vạch trên mỗi chai dầu gội có khuyến mãi và
+                                    gửi kèm phiếu trúng thưởng về văn phòng công ty, hạn chót đến hết ngày 31/7/2005 (căn cứ theo dấu bưu điện nơi gửi).
+                                    Sau đó công ty sẽ gửi thư thông báo trúng thưởng và cách thức nhận quà cho khách hàng
+
+                                </li>
+                            </ol>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    </body>
+</html>
