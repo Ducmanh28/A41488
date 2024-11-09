@@ -1,0 +1,43 @@
+
+/* div p{
+    color: blue;
+    background-color: yellow;
+} */
+/* tat ca the p la con cua the div */
+/* div > p {
+    color: red;
+    background-color: yellow;
+} */
+/* the p ngay sau the div */
+/* div + p{
+    background-color: brown;
+    color: blue;
+    font-weight: bold;
+} */
+
+div ~ p{
+    background-color: blueviolet;
+    color: red;
+}
+
+div:hover{
+    background-color: chocolate;
+    color:white;
+}
+
+ul li a:visited{
+    color: green;
+    text-decoration: underline;
+}
+
+input[type="text"]{
+    background-color: antiquewhite;
+}
+
+input[name="gender"]{
+    background-color: red;
+}
+
+a{
+    background-color: bisque;
+}
