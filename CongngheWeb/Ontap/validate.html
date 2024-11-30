@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate Form bằng jQuery</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        form {
+            width: 300px;
+            margin: 20px auto;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <form id="registrationForm">
+        <label for="username">Tên đăng nhập:</label>
+        <input type="text" id="username" name="username">
+        <div class="error" id="usernameError"></div>
+
+        <label for="password">Mật khẩu:</label>
+        <input type="password" id="password" name="password">
+        <div class="error" id="passwordError"></div>
+
+        <label for="confirmPassword">Nhập lại mật khẩu:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword">
+        <div class="error" id="confirmPasswordError"></div>
+
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email">
+        <div class="error" id="emailError"></div>
+
+        <label for="phone">Điện thoại:</label>
+        <input type="text" id="phone" name="phone">
+        <div class="error" id="phoneError"></div>
+
+        <label for="address">Địa chỉ:</label>
+        <input type="text" id="address" name="address">
+        <div class="error" id="addressError"></div>
+
+        <button type="submit">Đăng ký</button>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            $("#registrationForm").submit(function (e) {
+                e.preventDefault();
+
+                let isValid = true;
+
+                // Tên đăng nhập
+                const username = $("#username").val();
+                if (!username.match(/^[a-zA-Z0-9]{1,20}$/)) {
+                    $("#usernameError").text("Tên đăng nhập tối đa 20 ký tự, không chứa ký tự đặc biệt.");
+                    isValid = false;
+                } else {
+                    $("#usernameError").text("");
+                }
+
+                // Mật khẩu
+                const password = $("#password").val();
+                if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/)) {
+                    $("#passwordError").text("Mật khẩu phải có 8-16 ký tự, 1 ký tự hoa, thường, số, đặc biệt.");
+                    isValid = false;
+                } else {
+                    $("#passwordError").text("");
+                }
+
+                // Xác nhận mật khẩu
+                const confirmPassword = $("#confirmPassword").val();
+                if (confirmPassword !== password) {
+                    $("#confirmPasswordError").text("Mật khẩu không khớp.");
+                    isValid = false;
+                } else {
+                    $("#confirmPasswordError").text("");
+                }
+
+                // Email
+                const email = $("#email").val();
+                if (!email.match(/^\S+@\S+\.\S+$/)) {
+                    $("#emailError").text("Email không hợp lệ.");
+                    isValid = false;
+                } else {
+                    $("#emailError").text("");
+                }
+
+                // Số điện thoại
+                const phone = $("#phone").val();
+                if (!phone.match(/^\d{10}$/)) {
+                    $("#phoneError").text("Số điện thoại phải là 10 chữ số.");
+                    isValid = false;
+                } else {
+                    $("#phoneError").text("");
+                }
+
+                // Địa chỉ
+                const address = $("#address").val();
+                if (address.length > 50) {
+                    $("#addressError").text("Địa chỉ tối đa 50 ký tự.");
+                    isValid = false;
+                } else {
+                    $("#addressError").text("");
+                }
+
+                // Kiểm tra hợp lệ
+                if (isValid) {
+                    alert("Chúc mừng bạn đăng ký thành công.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

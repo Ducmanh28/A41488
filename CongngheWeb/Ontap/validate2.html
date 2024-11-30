@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm tra form</title>
+    <style>
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Câu 2: Kiểm tra form hợp lệ với JavaScript sau (2 điểm)</h3>
+    <form id="validationForm">
+        <label for="firstName">First Name*:</label>
+        <input type="text" id="firstName" name="firstName">
+        <div class="error" id="firstNameError"></div>
+
+        <label for="lastName">Last Name*:</label>
+        <input type="text" id="lastName" name="lastName">
+        <div class="error" id="lastNameError"></div>
+
+        <label for="captcha">What is 5 + 1?*:</label>
+        <input type="text" id="captcha" name="captcha">
+        <div class="error" id="captchaError"></div>
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" cols="30"></textarea>
+        <div class="error" id="messageError"></div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById("validationForm").addEventListener("submit", function (e) {
+            e.preventDefault(); // Ngăn không submit form mặc định
+
+            let isValid = true;
+
+            // Lấy giá trị các trường
+            const firstName = document.getElementById("firstName").value.trim();
+            const lastName = document.getElementById("lastName").value.trim();
+            const captcha = document.getElementById("captcha").value.trim();
+            const message = document.getElementById("message").value.trim();
+
+            // Reset lỗi
+            document.getElementById("firstNameError").textContent = "";
+            document.getElementById("lastNameError").textContent = "";
+            document.getElementById("captchaError").textContent = "";
+            document.getElementById("messageError").textContent = "";
+
+            // Kiểm tra First Name
+            if (firstName === "") {
+                document.getElementById("firstNameError").textContent = "First Name không được để trống.";
+                isValid = false;
+            }
+
+            // Kiểm tra Last Name
+            if (lastName === "") {
+                document.getElementById("lastNameError").textContent = "Last Name không được để trống.";
+                isValid = false;
+            }
+
+            // Kiểm tra Captcha
+            if (captcha === "") {
+                document.getElementById("captchaError").textContent = "Vui lòng trả lời câu hỏi.";
+                isValid = false;
+            } else if (captcha !== "6") {
+                document.getElementById("captchaError").textContent = "Câu trả lời không chính xác.";
+                isValid = false;
+            }
+
+            // Kiểm tra Message (không bắt buộc)
+            if (message.length > 200) {
+                document.getElementById("messageError").textContent = "Message không được vượt quá 200 ký tự.";
+                isValid = false;
+            }
+
+            // Nếu hợp lệ, hiển thị thông báo thành công
+            if (isValid) {
+                alert("Form hợp lệ. Gửi thành công!");
+            }
+        });
+    </script>
+</body>
+</html>
