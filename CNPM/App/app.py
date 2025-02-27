@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
 import mysql.connector
 from flask_bcrypt import Bcrypt
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 import random
 import datetime
@@ -13,7 +11,6 @@ app = Flask(__name__)
 # Cấu hình JWT
 app.config["JWT_SECRET_KEY"] = "thanglonguni1234"
 bcrypt = Bcrypt(app)
-limiter = Limiter(app, key_func=get_remote_address, default_limits=["5 per minute"])
 jwt = JWTManager(app)
 # Cấu hình MySQL
 db_config = {
@@ -31,36 +28,59 @@ def register():
     data = request.json
     username = data.get("username")
     email = data.get("email")
-    password = bcrypt.generate_password_hash(data['password']).decode('utf-8')  
-
-    if not username or not email or not password:
-        return jsonify({"error": "Username, email và password không được để trống"}), 400
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", 
-                       (username, email, password))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return jsonify({"message": "Đăng ký thành công"}), 201
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)}), 500
+    password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    role = data.get("role")
+    if role == "hotel_manager" or role == "guest":
+        if not username or not email or not password or not role:
+            return jsonify({"error": "Username, email, password hoặc role không được để trống"}), 400
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (username, email, password,role) VALUES (%s, %s, %s, %s)", 
+                        (username, email, password,role))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return jsonify({"message": "Đăng ký thành công"}), 201
+        except mysql.connector.Error as err:
+            return jsonify({"error": str(err)}), 500
+    else:
+        return jsonify({"message": "Vui lòng kiểm tra lại role: hotel_manager hoặc guest!"}), 400
 # Đăng nhập bằng username hoặc email
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
-    identifier = data['identifier']  # Có thể là username hoặc email
-    password = data['password']
-    cursor = mysql.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users WHERE username=%s OR email=%s", (identifier, identifier))
-    user = cursor.fetchone()
-    cursor.close()
-    if user and bcrypt.check_password_hash(user['password'], password):
-        access_token = create_access_token(identity=user['id'], expires_delta=datetime.timedelta(hours=1))
-        return jsonify(access_token=access_token), 200
-    return jsonify({"message": "Invalid credentials"}), 401
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
+
+    # Kiểm tra điều kiện: chỉ truyền vào username hoặc email (không cả hai)
+    if (username and email) or (not username and not email):
+        return jsonify({"error": "Bạn phải nhập username hoặc email, không được nhập cả hai hoặc bỏ trống"}), 400
+
+    identifier = username if username else email  # Chọn giá trị hợp lệ
+    field = "username" if username else "email"  # Xác định tìm theo username hay email
+
+    if not password:
+        return jsonify({"error": "Password không được để trống"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = f"SELECT username, password FROM users WHERE {field} = %s"
+        cursor.execute(query, (identifier,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if user and user[1] == password:
+            access_token = create_access_token(identity=user[0])
+            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token}), 200
+        else:
+            return jsonify({"error": "Sai username/email hoặc password"}), 401
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
 
 @app.route("/forgot-password", methods=["POST"])
 def forgot_password():
