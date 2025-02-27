@@ -1,0 +1,5 @@
+Hello! 
+ I am Luong Duc Manh! 
+ I study at Thang Long University! 
+ In room A708 
+ Learning Python

@@ -1,0 +1,7 @@
+f = open("data.txt", 'w')
+f.write("Hello!")
+f.write("\r \n I am Luong Duc Manh!")
+f.write("\r \n I study at Thang Long University!")
+f.write("\r \n In room A708")
+f.write("\r \n Learning Python")
+f.close()
