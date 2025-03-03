@@ -4,14 +4,12 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 import random
 import datetime
-import smtplib
+import random
 from time import time
 otp_storage = {}
 app = Flask(__name__)
 # Cấu hình JWT
 app.config["JWT_SECRET_KEY"] = "thanglonguni1234"
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
 # Cấu hình MySQL
 db_config = {
     "host": "localhost",
@@ -22,22 +20,24 @@ db_config = {
 # Kết nối database
 def get_db_connection():
     return mysql.connector.connect(**db_config)
+
 # Đăng ký tài khoản
 @app.route("/register", methods=["POST"])
 def register():
     data = request.json
     username = data.get("username")
     email = data.get("email")
-    password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    password = data.get("password")
+    phone = data.get("phone")
     role = data.get("role")
-    if role == "hotel_manager" or role == "guest":
-        if not username or not email or not password or not role:
+    if role == " HOTEL_OWNER" or role == "CUSTOMER":
+        if not username or not email or not password or not phone:
             return jsonify({"error": "Username, email, password hoặc role không được để trống"}), 400
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (username, email, password,role) VALUES (%s, %s, %s, %s)", 
-                        (username, email, password,role))
+            cursor.execute("INSERT INTO users (username, email,phone, password,role) VALUES (%s, %s, %s, %s, %s)", 
+                        (username, email,phone, password,role))
             conn.commit()
             cursor.close()
             conn.close()
@@ -45,7 +45,7 @@ def register():
         except mysql.connector.Error as err:
             return jsonify({"error": str(err)}), 500
     else:
-        return jsonify({"message": "Vui lòng kiểm tra lại role: hotel_manager hoặc guest!"}), 400
+        return jsonify({"message": "Vui lòng kiểm tra lại role: HOTEL_OWNER hoặc CUSTOMER!"}), 400
 # Đăng nhập bằng username hoặc email
 @app.route("/login", methods=["POST"])
 def login():
