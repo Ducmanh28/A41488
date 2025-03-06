@@ -5,8 +5,18 @@
 - Phân quyền cho user
 
 # Chức năng của app
-- Login: 
-    - Đăng ký tài khoản(Mã OTp xác nhận email)
-    - Đăng nhập
-    - Quên mật khẩu(Mã OTP gửi về Email hoặc sđt)
-    - Lấy lại mật khẩu
+- Đăng ký:
+  - Nhập thông tin User
+  - Mật khẩu phải trên 8 kí tự, có 1 kí tự đặc biệt
+  - Xác thực Email qua OTP 
+- Đăng nhập:
+  - Có thể sử dụng tên đăng nhập hoặc email để đăng nhập
+  - Khi đăng nhập thành công sẽ tạo ra 1 access token. Phải có token này thì mới có thể sử dụng các chức năng CRUD
+- Quên mật khẩu:
+  - Nhập Email --> Kiểm tra email --> Gửi OTP tới Email
+- Lấy lại mật khẩu:
+  - Nhập email
+  - Nhập OTP
+  - Nhập mật khẩu mới
+    - Mật khẩu mới phải có 8 kí tự, 1 kí tự đặc biệt
+    - Mật khẩu mới phải khác các mật khẩu cũ cách đây 3 lần gần nhất 

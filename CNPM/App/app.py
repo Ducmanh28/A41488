@@ -8,6 +8,7 @@ import random
 from time import time
 otp_storage = {}
 app = Flask(__name__)
+jwt = JWTManager(app)
 # Cấu hình JWT
 app.config["JWT_SECRET_KEY"] = "thanglonguni1234"
 # Cấu hình MySQL
@@ -15,7 +16,7 @@ db_config = {
     "host": "localhost",
     "user": "admin",
     "password": "28072003",
-    "database": "hotel_db"
+    "database": "hotel_booking_app"
 }
 # Kết nối database
 def get_db_connection():
@@ -30,7 +31,7 @@ def register():
     password = data.get("password")
     phone = data.get("phone")
     role = data.get("role")
-    if role == " HOTEL_OWNER" or role == "CUSTOMER":
+    if role == "HOTEL_OWNER" or role == "CUSTOMER":
         if not username or not email or not password or not phone:
             return jsonify({"error": "Username, email, password hoặc role không được để trống"}), 400
         try:
@@ -87,7 +88,6 @@ def forgot_password():
     data = request.get_json()
     email = data.get("email")
 
-    # Tạo cursor từ db (thay vì mysql.connection)
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
@@ -130,11 +130,127 @@ def reset_password():
     del otp_storage[email]
 
     return jsonify({"message": "Đặt lại mật khẩu thành công"}), 200
+@app.route("/hotels", methods=["POST"])
+@jwt_required()
+def create_hotel():
+    data = request.json
+    name = data.get("name")
+    location = data.get("location")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO hotels (name, location) VALUES (%s, %s)", (name, location))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Hotel added successfully"}), 201
+
+@app.route("/hotels", methods=["GET"])
+def get_hotels():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM hotels")
+    hotels = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(hotels)
+
+@app.route("/hotels/<int:hotel_id>", methods=["PUT"])
+@jwt_required()
+def update_hotel(hotel_id):
+    data = request.json
+    name = data.get("name")
+    location = data.get("location")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE hotels SET name = %s, location = %s WHERE id = %s", (name, location, hotel_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Hotel updated successfully"})
+
+@app.route("/hotels/<int:hotel_id>", methods=["DELETE"])
+@jwt_required()
+def delete_hotel(hotel_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM hotels WHERE id = %s", (hotel_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Hotel deleted successfully"})
+
+# 🏠 CRUD Room
+@app.route("/rooms", methods=["POST"])
+@jwt_required()
+def create_room():
+    data = request.json
+    hotel_id = data.get("hotel_id")
+    room_type = data.get("room_type")
+    price = data.get("price")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO rooms (hotel_id, room_type, price) VALUES (%s, %s, %s)", (hotel_id, room_type, price))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Room added successfully"}), 201
+
+@app.route("/rooms", methods=["GET"])
+def get_rooms():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM rooms")
+    rooms = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(rooms)
+
+# 📅 CRUD Booking
+@app.route("/bookings", methods=["POST"])
+@jwt_required()
+def create_booking():
+    data = request.json
+    user_id = data.get("user_id")
+    room_id = data.get("room_id")
+    check_in = data.get("check_in")
+    check_out = data.get("check_out")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO bookings (user_id, room_id, check_in, check_out) VALUES (%s, %s, %s, %s)", (user_id, room_id, check_in, check_out))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Booking created successfully"}), 201
+
+@app.route("/bookings", methods=["GET"])
+@jwt_required()
+def get_bookings():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM bookings")
+    bookings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(bookings)
+
 # API bảo vệ bằng token
 @app.route("/protected", methods=["GET"])
 @jwt_required()
 def protected():
     return jsonify({"message": "Bạn đã truy cập vào API bảo vệ bằng token!"}), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
