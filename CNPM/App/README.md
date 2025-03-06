@@ -11,7 +11,7 @@
   - Xác thực Email qua OTP 
   - Chọn vai trò: 
     - Chỉ có thể chọn hotel_owner: người quản lý khách sạn
-    - 
+    - Customer: Khách hàng
 - Đăng nhập:
   - Có thể sử dụng tên đăng nhập hoặc email để đăng nhập
   - Khi đăng nhập thành công sẽ tạo ra 1 access token. Phải có token này thì mới có thể sử dụng các chức năng CRUD

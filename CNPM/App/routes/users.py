@@ -10,17 +10,7 @@ import re
 import config
 otp_storage = {}
 users_bp = Blueprint("users", __name__)
-def get_user_from_token(token):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
 
-    query = "SELECT users.* FROM users INNER JOIN tokens ON users.id = tokens.user_id WHERE tokens.access_token = %s"
-    cursor.execute(query, (token,))
-    user = cursor.fetchone()
-    
-    cursor.close()
-    conn.close()
-    return user
 
 def send_email(receiver_email, otp_code):
     try:
@@ -212,15 +202,3 @@ def reset_password():
 
     return jsonify({"message": "Đặt lại mật khẩu thành công"}), 200
 
-@users_bp.route("/get_user", methods=["GET"])
-def get_user_info():
-    auth_header = request.headers.get("Authorization")
-    if not auth_header:
-        return {"error": "Unauthorized"}, 401
-
-    token = auth_header.split(" ")[1]  # Lấy token từ "Bearer <token>"
-    user = get_user_from_token(token)
-    
-    if user:
-        return {"user_id": user["id"], "role": user["role"]}
-    return {"error": "Unauthorized"}, 401
