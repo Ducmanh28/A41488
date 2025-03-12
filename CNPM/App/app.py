@@ -85,7 +85,7 @@ def login():
 
 @app.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    data = request.get_json()
+    data = request.get_json
     email = data.get("email")
 
     conn = get_db_connection()

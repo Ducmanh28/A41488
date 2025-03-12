@@ -105,7 +105,6 @@ def register():
         return jsonify({"message": "Mã OTP đã được gửi đến email!"}), 200
     else:
         return jsonify({"error": "Không thể gửi email!"}), 500
-
 @users_bp.route("/login", methods=["POST"])
 def login():
     data = request.json
@@ -138,11 +137,10 @@ def login():
             return jsonify({"error": "Sai username/email hoặc password"}), 401
 
     except get_db_connection.Error as err:
-        return jsonify({"error": str(err)}), 500
-    
+        return jsonify({"error": str(err)}), 500  
 @users_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    data = request.get_json()
+    data = request.get_json
     email = data.get("email")
 
     conn = get_db_connection()
@@ -163,7 +161,6 @@ def forgot_password():
         return jsonify({"message": "Mã OTP đã được gửi đến email"}), 200
     else:
         return jsonify({"error": "Không thể gửi email!"}), 500
-    
 @users_bp.route("/reset-password", methods=["POST"])
 def reset_password():
     data = request.json
@@ -201,4 +198,37 @@ def reset_password():
     del otp_storage[email]
 
     return jsonify({"message": "Đặt lại mật khẩu thành công"}), 200
+@users_bp.route("/users/<int:user_id>",methods=["GET"])
+def get_users(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE id = %s",(user_id, ))
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(users)
+@users_bp.route("/users/<int:user_id>",methods=["PUT"])
+def updated_users(user_id):
+    data = request.json
+    username = data.get("username")
+    phone = data.get("phone")
+    email = data.get("email")
+    password = data.get("password")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET username = %s, phone = %s, email = %s, password = %s WHERE id = %s", (username, phone, email, password,user_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
+    return jsonify({"message": "User updated successfully"}), 201
+@users_bp.route("/users/<int:user_id>",methods=["DELETE"])
+def deleted_users(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id = %s", (user_id, ))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return jsonify({"message": "User deleted successfully"}), 201

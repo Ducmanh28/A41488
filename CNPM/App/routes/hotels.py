@@ -3,7 +3,8 @@ from flask_jwt_extended import jwt_required
 from db import get_db_connection
 
 hotels_bp = Blueprint("hotels", __name__)
-
+@hotels_bp.route("/hotels", methods=["GET"])
+@jwt_required()
 def get_info_hotel_owner(username):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -11,6 +12,7 @@ def get_info_hotel_owner(username):
     users = cursor.fetchall()
     cursor.close()
     conn.close()
+    return jsonify(users)
 @hotels_bp.route("/hotels", methods=["POST"])
 @jwt_required()
 def create_hotel():
@@ -62,6 +64,7 @@ def update_hotel(hotel_id):
 
     return jsonify({"message": "Hotel updated successfully"}), 201
 @hotels_bp.route("/hotels/<int:hotel_id>", methods=["DELETE"])
+@jwt_required()
 def deleted_hotel(hotel_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -71,3 +74,22 @@ def deleted_hotel(hotel_id):
     conn.close()
     
     return jsonify({"message": "Hotel deleted successfully"}), 201
+@hotels_bp.route("/hotels/<int:hotel_id>/rooms", methods=["POST"])
+@jwt_required()
+def create_room(hotel_id):
+    data = request.json
+    room_number = data.get("room_number")
+    room_type = data.get("room_type")
+    price = data.get("price")
+    description = data.get("description")
+    is_available = 1
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO rooms (hotel_id,room_number,room_type,price,is_available,description) VALUES (%s, %s)", (hotel_id,room_number,room_type,price,is_available,description ))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Room added successfully"}), 201
+    
