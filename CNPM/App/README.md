@@ -3,6 +3,8 @@
 - Thêm phần validate cho mật khẩu: trên 8 ký tự, có 1 ký tự đặc biệt
 - Mật khẩu mới khi đổi phải khác mật khẩu cũ 3 lần gần nhất
 - Phân quyền cho user
+- Kiểm tra biến History trong db
+- Sử dụng biến history để lấy ra lịch sử đổi mật khẩu
 
 # Chức năng của app
 - Đăng ký:
