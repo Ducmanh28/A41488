@@ -59,3 +59,27 @@ Nhập vào email của tài khoản đã đăng ký, nếu Email đúng sẽ th
 Sau khi có otp, nhập otp, email và mật khẩu mới để đặt lại mật khẩu. Lưu ý: Mật khẩu mới phải khác mật khẩu cũ đã đặt cách đây 3 lần gần nhất!
 
 ![](/Anh/Screenshot_1026.png)
+
+# Mô tả quy trình khởi tạo phòng
+Chỉ có người chủ của hotel mới có thể tạo được phòng của họ.
+
+Người chủ khách sạn sẽ truy cập vào trang chủ khách sạn mà họ muốn thêm, sửa, xóa phòng.
+
+Sau đó sẽ thực hiện các thao tác với phòng
+
+# Mô tả quy trình tạo booking
+Chỉ có khách hàng mới có quyền tạo booking
+
+Người dùng sẽ chọn khu vực mà họ muốn thuê. 
+
+Ứng dụng hiển thị danh sách các khách sạn 
+
+Người dùng chọn loại khách sạn, sau đó chọn loại phòng(1-5 ứng với mức độ phòng từ thấp đén cao)
+
+Sau chọn và thanh toán xong phòng, trạng thái phòng sẽ được để thành *đã có người thuê*
+
+# Mô tả quá trình đổi mật khẩu:
+![](/Anh/Screenshot_1028.png)
+
+Khó khăn trong việc xử lý thông tin lấy từ binlog
+

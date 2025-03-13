@@ -140,7 +140,7 @@ def login():
         return jsonify({"error": str(err)}), 500  
 @users_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    data = request.get_json
+    data = request.json
     email = data.get("email")
 
     conn = get_db_connection()

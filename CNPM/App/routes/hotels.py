@@ -86,10 +86,58 @@ def create_room(hotel_id):
     
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO rooms (hotel_id,room_number,room_type,price,is_available,description) VALUES (%s, %s)", (hotel_id,room_number,room_type,price,is_available,description ))
+    cursor.execute("INSERT INTO rooms (hotel_id,room_number,room_type,price,is_available,description) VALUES (%s, %s, %s, %s, %s, %s)", (hotel_id,room_number,room_type,price,is_available,description ))
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({"message": "Room added successfully"}), 201
+@hotels_bp.route("/hotels/<int:hotel_id>/rooms/<int:rooms_id>", methods=["PUT"])
+@jwt_required()
+def update_room(hotel_id,rooms_id):
+    data = request.json
+    room_number = data.get("room_number")
+    room_type = data.get("room_type")
+    price = data.get("price")
+    description = data.get("description")
+    is_available = 1
     
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE rooms SET room_number = %s,room_type = %s,price =%s, is_available = %s,description= %s WHERE id = %s and hotel_id = %s", (room_number,room_type,price,is_available,description,rooms_id,hotel_id ))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Room updated successfully"}), 201
+@hotels_bp.route("/hotels/<int:hotel_id>/rooms/<int:room_id>", methods=["DELETE"])
+@jwt_required()
+def deleted_rooms(hotel_id,room_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM hotels WHERE id = %s and hotel_id = %s", (room_id, hotel_id ))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return jsonify({"message": "Room deleted successfully"}), 201
+@hotels_bp.route("/hotels/<int:hotel_id>/rooms/<int:room_id>", methods=["GET"])
+def get_rooms(room_id, hotel_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM rooms WHERE id = %s AND hotel_id = %s", (room_id, hotel_id))
+    rooms = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(rooms)
+@hotels_bp.route("/hotels/<int:hotel_id>/rooms", methods=["GET"])
+def get_all_rooms(hotel_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM rooms WHERE hotel_id = %s",(hotel_id, ))
+    rooms = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(rooms)
