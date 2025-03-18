@@ -1,0 +1,10 @@
+python
+flask
+mysql.connector
+re
+flask_jwt_extended
+flask_cors
+dotenv
+smtplib
+ssl
+email

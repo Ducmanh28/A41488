@@ -64,3 +64,9 @@ def deleted_hotel(hotel_id):
     conn.close()
     
     return jsonify({"message": "Hotel deleted successfully"}), 201
+@hotels_bp.route("/hotels/find", methods=["GET"])
+def find_hotel_by_area():
+    data = request.json
+    area = data.get("area")
+    conn = get_db_connection()
+    cursor = conn.cursor
