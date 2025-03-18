@@ -5,6 +5,8 @@
 - Phân quyền cho user
 - Kiểm tra biến History trong db
 - Sử dụng biến history để lấy ra lịch sử đổi mật khẩu
+- Sửa lại hướng đi, bỏ room, chỉ cần hotel. 
+
 
 # Chức năng của app
 - Đăng ký:
