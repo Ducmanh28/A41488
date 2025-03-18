@@ -5,8 +5,9 @@ from app.routes.auth import auth_bp
 from app.routes.users import customers_bp
 from app.routes.hotels import hotels_bp
 from app.routes.bookings import bookings_bp
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 # Cấu hình JWT
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY

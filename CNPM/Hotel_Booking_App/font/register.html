@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Đăng Ký</title>
+</head>
+<body>
+    <h2>Đăng Ký</h2>
+    <input type="text" id="username" placeholder="Tên đăng nhập"><br>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Mật khẩu"><br>
+    <input type="text" id="phone" placeholder="Số điện thoại"><br>
+    <input type="text" id="full_name" placeholder="Họ và Tên"><br>
+    <input type="text" id="citizen_id" placeholder="CCCD/CMND"><br>
+    <button onclick="sendRegister()">Đăng Ký</button>
+
+    <div id="otpSection" style="display:none;">
+        <h3>Nhập mã OTP</h3>
+        <input type="text" id="otp" placeholder="Nhập OTP"><br>
+        <button onclick="confirmRegister()">Xác nhận</button>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>

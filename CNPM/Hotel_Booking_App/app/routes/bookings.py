@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from db import get_db_connection
+import mysql.connector as connect
 
 bookings_bp = Blueprint("bookings", __name__)
 
@@ -28,7 +29,7 @@ def create_booking():
         conn.commit()
         return jsonify({"message": "Đặt phòng thành công"}), 201
 
-    except get_db_connection.Error as err:
+    except connect.Error as err:
         conn.rollback()
         return jsonify({"error": str(err)}), 500
 
@@ -46,6 +47,7 @@ def get_bookings():
     conn.close()
 
     return jsonify(bookings)
+@bookings_bp.route("/bookings/<int:booking_id>",methods=["UPDATE"])
 @bookings_bp.route("/bookings/<int:booking_id>",methods=["DELETE"])
 @jwt_required()
 def delete_booking(booking_id):
