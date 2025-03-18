@@ -69,4 +69,11 @@ def find_hotel_by_area():
     data = request.json
     area = data.get("area")
     conn = get_db_connection()
-    cursor = conn.cursor
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM hotels WHERE area = %s",(area, ))
+    hotels = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return jsonify(hotels)
+    

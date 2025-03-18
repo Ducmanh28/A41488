@@ -48,6 +48,13 @@ def get_bookings():
 
     return jsonify(bookings)
 @bookings_bp.route("/bookings/<int:booking_id>",methods=["UPDATE"])
+@jwt_required()
+def updated_bookings(booking_id):
+    data = request.json
+    if not data:
+        return jsonify({"message": "Không có data!"})
+    room_type_id = data.get("room_type_id")
+    
 @bookings_bp.route("/bookings/<int:booking_id>",methods=["DELETE"])
 @jwt_required()
 def delete_booking(booking_id):
