@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết khách sạn</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .hotel-container { margin-top: 30px; }
+        .back-btn { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">HotelBooking</a>
+        </div>
+    </nav>
+
+    <!-- Chi tiết khách sạn -->
+    <div class="container hotel-container">
+        <button class="btn btn-secondary back-btn" onclick="goBack()">⬅ Quay lại</button>
+        <h2 class="text-center" id="hotel-name">Đang tải...</h2>
+        <div class="card">
+            <div class="card-body">
+                <p><strong>📍 Địa chỉ:</strong> <span id="hotel-address"></span></p>
+                <p><strong>📞 Hotline:</strong> <span id="hotel-hotline"></span></p>
+                <p><strong>📌 Khu vực:</strong> <span id="hotel-area"></span></p>
+                <p><strong>💰 Giá:</strong> <span id="hotel-rate"></span> VNĐ</p>
+                <p><strong>🏨 Trạng thái:</strong> <span id="hotel-status"></span></p>
+                <p><strong>📝 Mô tả:</strong> <span id="hotel-description"></span></p>
+                <p><strong>⭐ Đánh giá:</strong> <span id="hotel-review"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lấy hotel_id từ URL
+        function getHotelIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get("hotel_id");
+        }
+
+        // Gửi request lấy thông tin khách sạn
+        async function fetchHotelDetails() {
+            const hotelId = getHotelIdFromUrl();
+            if (!hotelId) {
+                console.error("Không tìm thấy hotel_id trong URL");
+                return;
+            }
+
+            const apiUrl = `http://127.0.0.1:5000/hotels/${hotelId}`;
+            console.log("Fetching data from:", apiUrl);
+
+            try {
+                let response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("Lỗi khi lấy dữ liệu khách sạn.");
+                }
+
+                let hotel = await response.json();
+
+                // Hiển thị thông tin khách sạn
+                document.getElementById("hotel-name").textContent = hotel.name || "Không xác định";
+                document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
+                document.getElementById("hotel-hotline").textContent = hotel.hotline || "Không có thông tin";
+                document.getElementById("hotel-area").textContent = hotel.area || "Không xác định";
+                document.getElementById("hotel-rate").textContent = hotel.rate ? hotel.rate + " triệu" : "Chưa có";
+                document.getElementById("hotel-status").textContent = hotel.status || "Không rõ";
+                document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
+                document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
+
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu khách sạn:", error);
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Gọi hàm fetch dữ liệu
+        fetchHotelDetails();
+    </script>
+
+</body>
+</html>

@@ -3,21 +3,6 @@ from flask_jwt_extended import jwt_required
 from db import get_db_connection
 
 hotels_bp = Blueprint("hotels", __name__)
-@hotels_bp.route("/hotels", methods=["POST"])
-@jwt_required()
-def create_hotel():
-    data = request.json
-    name = data.get("name")
-    location = data.get("location")
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO hotels (name, location) VALUES (%s, %s)", (name, location))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return jsonify({"message": "Hotel added successfully"}), 201
 @hotels_bp.route("/hotels/<int:hotel_id>", methods=["GET"])
 def get_hotel(hotel_id):
     conn = get_db_connection()
@@ -38,42 +23,56 @@ def get_all_hotels():
     conn.close()
 
     return jsonify(hotels)
-@hotels_bp.route("/hotels/<int:hotel_id>", methods=["PUT"])
-@jwt_required()
-def update_hotel(hotel_id):
-    data = request.json
-    name = data.get("name")
-    location = data.get("location")
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE hotels SET location = %s, name = %s WHERE id = %s", (location, name, hotel_id))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return jsonify({"message": "Hotel updated successfully"}), 201
-@hotels_bp.route("/hotels/<int:hotel_id>", methods=["DELETE"])
-@jwt_required()
-def deleted_hotel(hotel_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM hotels WHERE id = %s", (hotel_id, ))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    return jsonify({"message": "Hotel deleted successfully"}), 201
-@hotels_bp.route("/hotels/find", methods=["GET"])
-def find_hotel_by_area():
+@hotels_bp.route("/hotels/find", methods=["POST"])
+def find_hotel():
     data = request.json
     area = data.get("area")
+    check_in = data.get("check_in")
+    check_out = data.get("check_out")
+    status = data.get("status")
+    print(data)
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM hotels WHERE area = %s",(area, ))
+
+    # Lấy danh sách khách sạn theo khu vực
+    cursor.execute("SELECT * FROM hotels WHERE area = %s AND status = %s",(area,status ))
     hotels = cursor.fetchall()
+
+    # Kiểm tra nếu bảng busy_room không có dữ liệu
+    cursor.execute("SELECT COUNT(*) as total FROM busy_room")
+    total_busy_rooms = cursor.fetchone()["total"]
+
+    if total_busy_rooms == 0:
+        cursor.close()
+        conn.close()
+        return jsonify(hotels)  
+
+    # Danh sách khách sạn có phòng trống
+    available_hotels = []
+
+    for hotel in hotels:
+        hotel_id = hotel["id"]
+        
+        # Kiểm tra số lượng phòng bị bận trong khoảng thời gian nhập vào
+        cursor.execute("""
+            SELECT COUNT(*) as busy_count FROM busy_room 
+            WHERE hotel_id = %s AND (
+                (busy_from <= %s AND busy_to > %s) OR
+                (busy_from < %s AND busy_to >= %s) OR
+                (busy_from >= %s AND busy_to <= %s)
+            )
+        """, (hotel_id, check_in, check_in, check_out, check_out, check_in, check_out))
+
+        busy_count = cursor.fetchone()["busy_count"] or 0
+
+        # Nếu không có phòng nào bị bận, thêm khách sạn vào danh sách khả dụng
+        if busy_count == 0:
+            available_hotels.append(hotel)
+
     cursor.close()
     conn.close()
-    
-    return jsonify(hotels)
+    print(available_hotels)
+    return jsonify(available_hotels)
+
     

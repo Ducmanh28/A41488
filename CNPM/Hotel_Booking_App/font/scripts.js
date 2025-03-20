@@ -49,3 +49,32 @@ function login() {
     })
     .catch(error => console.error("Lỗi:", error));
 }
+async function fetchHotels() {
+    try {
+        let response = await fetch("http://127.0.0.1:5000/hotels");
+        let hotels = await response.json();
+
+        let hotelList = document.getElementById("hotel-list");
+        hotelList.innerHTML = ""; 
+
+        hotels.forEach(hotel => {
+            let hotelCard = `
+                <div class="col-md-4">
+                    <div class="card hotel-card">
+                        <div class="card-body">
+                            <h5 class="card-title">${hotel.name}</h5>
+                            <p class="card-text">📍 Địa chỉ: ${hotel.address}</p>
+                            <p class="card-text">⭐ Đánh giá: ${hotel.rate} sao</p>
+                            <p class="card-text">📞 Hotline: ${hotel.hotline}</p>
+                            <p class="card-text">🏨 Trạng thái: ${hotel.status}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            hotelList.innerHTML += hotelCard;
+        });
+    } catch (error) {
+        console.error("Lỗi khi tải danh sách khách sạn:", error);
+    }
+}
+fetchHotels();
