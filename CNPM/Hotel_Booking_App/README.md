@@ -4,8 +4,7 @@
 - Admin tự thêm khách sạn
 - Khách hàng chỉ có thể tạo Booking
 - Lưu ý về các dịch vụ đi kèm ví dụ như số người đi, loại phòng
-
-
+- ĐẶT HỘ, ĐẶT NHIỀU CÙNG 1 LÚC
 # Công việc cần làm hàng tuần
 ## Tuần 6
 - Thiết kế lại hướng đi cho ứng dụng
@@ -53,5 +52,5 @@ Ban đầu người dùng sẽ cần đăng ký, sau đó đăng nhập vào h�
 - Chọn loại phòng
 - Chọn các dịch vụ thêm
 - Xem lại hóa đơn
-- Thanh toán trước 70% của hóa đơn
+- Thanh toán trước 70% của hóa đơn(MOMO)
 - Thanh toán thành công! Xác nhận đặt phòng!
