@@ -3,6 +3,7 @@ import ssl
 from email.message import EmailMessage
 from config import Config
 import re
+from flask_jwt_extended import get_jwt_identity
 from db import get_db_connection
 
 def send_email(receiver_email, otp_code):
@@ -38,3 +39,7 @@ def is_new_password_valid(new_password, old_passwords):
 def is_valid_password(password):
     """Kiểm tra mật khẩu phải trên 8 ký tự và chứa ít nhất 1 ký tự đặc biệt"""
     return len(password) > 8 and re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
+def get_username_from_token():
+    """Lấy username từ JWT token của người dùng đã đăng nhập."""
+    username = get_jwt_identity()  # Lấy giá trị identity từ token
+    return username

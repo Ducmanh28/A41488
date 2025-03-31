@@ -29,7 +29,7 @@ def find_hotel():
     area = data.get("area")
     check_in = data.get("check_in")
     check_out = data.get("check_out")
-    status = data.get("status")
+    status = "Available"
     print(data)
 
     conn = get_db_connection()

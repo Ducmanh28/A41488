@@ -2,16 +2,17 @@ from db import get_db_connection
 import hashlib
 import hmac
 import requests
+from config import Config
 from flask import Blueprint, request, jsonify
-payments_bp = Blueprint("customers", __name__)
+payments_bp = Blueprint("payments", __name__)
 
-MOMO_PARTNER_CODE = "MOMOXXXXXX"
-MOMO_ACCESS_KEY = "XXXXXXXXXXXXXXXX"
-MOMO_SECRET_KEY = "XXXXXXXXXXXXXXXX"
-MOMO_API_URL = "http://test-payment.momo.vn/v2/gateway/api/create"
+MOMO_PARTNER_CODE = Config.MOMO_PARTNER_CODE
+MOMO_ACCESS_KEY = Config.MOMO_ACCESS_KEY
+MOMO_SECRET_KEY = Config.MOMO_SECRET_KEY
+MOMO_API_URL = Config.MOMO_API_URL
 
-MOMO_IPN_URL = "http://127.0.0.1:5000/payment/momo/callback"
-MOMO_REDIRECT_URL = "http://127.0.0.1:5000/payment/success"
+MOMO_IPN_URL = Config.MOMO_IPN_URL
+MOMO_REDIRECT_URL = Config.MOMO_REDIRECT_URL
 
 
 @payments_bp.route("/payment/momo/create", methods=["POST"])
@@ -57,7 +58,7 @@ def create_momo_payment():
     return jsonify(response_data)
 
 # Xử lý callback từ MoMo
-@app.route("/payment/momo/callback", methods=["POST"])
+@payments_bp.route("/payment/momo/callback", methods=["POST"])
 def momo_callback():
     data = request.json
 
