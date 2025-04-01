@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin cá nhân</title>
+    <style>
+        /* General page styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        /* Card for displaying user info */
+        #user-info {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #user-info p {
+            font-size: 16px;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        #user-info span {
+            font-weight: bold;
+        }
+
+        /* Button styles */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Form styles for editing */
+        .edit-form {
+            display: none; /* Form is hidden by default */
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .edit-form h3 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        .edit-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .edit-form input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            #user-info {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .edit-form {
+                padding: 15px;
+            }
+
+            .edit-form input {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Thông tin cá nhân</h2>
+
+    <!-- Hiển thị thông tin người dùng -->
+    <div id="user-info">
+        <p><strong>Username:</strong> <span id="username">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="email">Loading...</span></p>
+        <p><strong>Phone:</strong> <span id="phone">Loading...</span></p>
+        <p><strong>Full Name:</strong> <span id="full_name">Loading...</span></p>
+        <p><strong>Birth Date:</strong> <span id="birth_date">Loading...</span></p>
+        <p><strong>Address:</strong> <span id="current_address">Loading...</span></p>
+    </div>
+
+    <!-- Nút chỉnh sửa thông tin -->
+    <button id="editBtn">Chỉnh sửa</button>
+
+    <!-- Form chỉnh sửa (ban đầu ẩn đi) -->
+    <div class="edit-form" id="editForm">
+        <h3>Chỉnh sửa thông tin</h3>
+        <form>
+            <label for="new_username">Username:</label>
+            <input type="text" id="new_username"><br>
+            <label for="new_email">Email:</label>
+            <input type="email" id="new_email"><br>
+            <label for="new_phone">Phone:</label>
+            <input type="text" id="new_phone"><br>
+            <label for="new_full_name">Full Name:</label>
+            <input type="text" id="new_full_name"><br>
+            <label for="new_birth_date">Birth Date:</label>
+            <input type="date" id="new_birth_date"><br>
+            <label for="new_address">Current Address:</label>
+            <input type="text" id="new_address"><br>
+            <button type="submit" id="submitBtn">Xác nhận</button>
+        </form>
+    </div>
+
+    <script>
+        // Lấy user_id từ localStorage
+        const userId = localStorage.getItem('customer_id');
+        const accessToken = localStorage.getItem('access_token');
+
+        // Yêu cầu GET để lấy thông tin người dùng từ backend
+        fetch(`http://127.0.0.1:5000/customers/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Cập nhật thông tin người dùng lên giao diện
+            document.getElementById('username').textContent = data.username;
+            document.getElementById('email').textContent = data.email;
+            document.getElementById('phone').textContent = data.phone;
+            document.getElementById('full_name').textContent = data.full_name;
+            document.getElementById('birth_date').textContent = data.birth_date;
+            document.getElementById('current_address').textContent = data.current_address;
+
+            // Lưu thông tin vào localStorage để sử dụng khi chỉnh sửa
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('email', data.email);
+            localStorage.setItem('phone', data.phone);
+            localStorage.setItem('full_name', data.full_name);
+            localStorage.setItem('birth_date', data.birth_date);
+            localStorage.setItem('current_address', data.current_address);
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            alert('Không thể tải thông tin người dùng');
+        });
+
+        // Hiển thị form chỉnh sửa khi bấm nút "Chỉnh sửa"
+        document.getElementById('editBtn').addEventListener('click', function() {
+            document.getElementById('editForm').style.display = 'block'; // Hiển thị form
+            // Điền thông tin hiện tại vào các trường chỉnh sửa
+            document.getElementById('new_username').value = localStorage.getItem('username');
+            document.getElementById('new_email').value = localStorage.getItem('email');
+            document.getElementById('new_phone').value = localStorage.getItem('phone');
+            document.getElementById('new_full_name').value = localStorage.getItem('full_name');
+            document.getElementById('new_birth_date').value = localStorage.getItem('birth_date');
+            document.getElementById('new_address').value = localStorage.getItem('current_address');
+        });
+
+        // Khi người dùng gửi form chỉnh sửa
+        document.getElementById('editForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const newUsername = document.getElementById('new_username').value || localStorage.getItem('username');
+            const newEmail = document.getElementById('new_email').value || localStorage.getItem('email');
+            const newPhone = document.getElementById('new_phone').value || localStorage.getItem('phone');
+            const newFullName = document.getElementById('new_full_name').value || localStorage.getItem('full_name');
+            const newBirthDate = document.getElementById('new_birth_date').value || localStorage.getItem('birth_date');
+            const newAddress = document.getElementById('new_address').value || localStorage.getItem('current_address');
+
+            // Gửi yêu cầu cập nhật thông tin đến API backend
+            fetch(`http://127.0.0.1:5000/customers/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    username: newUsername,
+                    email: newEmail,
+                    phone: newPhone,
+                    full_name: newFullName,
+                    birth_date: newBirthDate,
+                    current_address: newAddress
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert('Cập nhật thông tin thành công');
+                    // Cập nhật thông tin mới vào localStorage và giao diện
+                    localStorage.setItem('username', newUsername);
+                    localStorage.setItem('email', newEmail);
+                    localStorage.setItem('phone', newPhone);
+                    localStorage.setItem('full_name', newFullName);
+                    localStorage.setItem('birth_date', newBirthDate);
+                    localStorage.setItem('current_address', newAddress);
+
+                    // Cập nhật giao diện với thông tin mới
+                    document.getElementById('username').textContent = newUsername;
+                    document.getElementById('email').textContent = newEmail;
+                    document.getElementById('phone').textContent = newPhone;
+                    document.getElementById('full_name').textContent = newFullName;
+                    document.getElementById('birth_date').textContent = newBirthDate;
+                    document.getElementById('current_address').textContent = newAddress;
+
+                    // Ẩn form chỉnh sửa
+                    document.getElementById('editForm').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error updating user data:', error);
+                alert('Không thể cập nhật thông tin người dùng');
+            });
+        });
+    </script>
+
+</body>
+</html>

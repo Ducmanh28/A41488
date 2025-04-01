@@ -1,7 +1,7 @@
 from db import get_db_connection
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from app.utils import get_username_from_token
+from app.utils import get_userid_from_token
 customers_bp = Blueprint("customers", __name__)
 
 
@@ -88,18 +88,29 @@ def deleted_users(user_id):
     
     return jsonify({"message": "User deleted successfully"}), 201
 @customers_bp.route('/get_customer_info', methods=['GET'])
-@jwt_required()  # Yêu cầu phải có JWT token
+@jwt_required()  
 def get_customer_info():
-    customer_name = get_username_from_token()
-    if customer_name:
+    customer_id = get_userid_from_token()
+    if customer_id:
     # Truy vấn thông tin từ database
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM customers WHERE username = %s", (customer_name,))
+        cursor.execute("SELECT * FROM customers WHERE id = %s", (customer_id,))
         customer = cursor.fetchone()
-
+        cursor.close()
+        conn.close()
         if not customer:
             return jsonify({"error": "Khách hàng không tồn tại"}), 404
     else: 
         return jsonify({"error": "Không tìm thấy tên khách hàng"}), 404
     return jsonify(customer)
+@customers_bp.route("/customer/<int:user_id>/invoices",methods=["GET"])
+@jwt_required()
+def get_invoices_of_user(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM invoices WHERE customer_id = %s",(user_id, ))
+    history = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(history)

@@ -44,7 +44,8 @@ function login() {
         alert(result.message || result.error);
         if (result.access_token) {
             localStorage.setItem("access_token", result.access_token);
-            window.location.href = "home.html";
+            localStorage.setItem('customer_id', result.customer_id);
+            window.location.href = "home1.html";
         }
     })
     .catch(error => console.error("Lỗi:", error));

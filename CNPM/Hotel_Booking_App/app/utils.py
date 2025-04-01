@@ -39,7 +39,7 @@ def is_new_password_valid(new_password, old_passwords):
 def is_valid_password(password):
     """Kiểm tra mật khẩu phải trên 8 ký tự và chứa ít nhất 1 ký tự đặc biệt"""
     return len(password) > 8 and re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
-def get_username_from_token():
-    """Lấy username từ JWT token của người dùng đã đăng nhập."""
-    username = get_jwt_identity()  # Lấy giá trị identity từ token
-    return username
+def get_userid_from_token():
+    """Lấy user_id từ JWT token của người dùng đã đăng nhập."""
+    user_id = get_jwt_identity()
+    return user_id

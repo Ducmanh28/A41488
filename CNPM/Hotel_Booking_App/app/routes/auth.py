@@ -25,7 +25,7 @@ def register():
         return jsonify({"error": "Mật khẩu phải trên 8 kí tự và chứa ít nhất 1 kí tự đặc biệt!"}),400
     # Kiểm tra thông tin đầu vào
     if not username or not email or not password or not phone or not full_name or not citizen_id:
-        return jsonify({"error": "Vui lòng nhập đầy đủ thôn tin trước khi đăng ký!"}), 400
+        return jsonify({"error": "Vui lòng nhập đầy đủ thông tin trước khi đăng ký!"}), 400
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -77,27 +77,26 @@ def login():
     email = data.get("email")
     password = data.get("password")
 
-    # Kiểm tra điều kiện: chỉ truyền vào username hoặc email (không cả hai)
     if (username and email) or (not username and not email):
         return jsonify({"error": "Bạn phải nhập username hoặc email, không được nhập cả hai hoặc bỏ trống"}), 400
 
-    identifier = username if username else email  # Chọn giá trị hợp lệ
-    field = "username" if username else "email"  # Xác định tìm theo username hay email
+    identifier = username if username else email  
+    field = "username" if username else "email"  
 
     if not password:
         return jsonify({"error": "Password không được để trống"}), 400
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        query = f"SELECT username, password FROM customers WHERE {field} = %s"
+        query = f"SELECT username, password, id FROM customers WHERE {field} = %s"
         cursor.execute(query, (identifier,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
 
         if user and user[1] == password:
-            access_token = create_access_token(identity=user[0])
-            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token}), 200
+            access_token = create_access_token(identity=user[2])
+            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2]}), 200
         else:
             return jsonify({"error": "Sai username/email hoặc password"}), 401
 

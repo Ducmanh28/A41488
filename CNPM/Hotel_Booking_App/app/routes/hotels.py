@@ -24,6 +24,7 @@ def get_all_hotels():
 
     return jsonify(hotels)
 @hotels_bp.route("/hotels/find", methods=["POST"])
+@jwt_required()
 def find_hotel():
     data = request.json
     area = data.get("area")
