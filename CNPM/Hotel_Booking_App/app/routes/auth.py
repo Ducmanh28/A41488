@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 import mysql.connector as connect
 from db import get_db_connection
+from datetime import timedelta
 import random
 from app.utils import get_db_connection,get_old_passwords,send_email,is_new_password_valid,is_valid_password
 from time import time
@@ -95,7 +96,7 @@ def login():
         conn.close()
 
         if user and user[1] == password:
-            access_token = create_access_token(identity=user[2])
+            access_token = create_access_token(identity=user[0],expires_delta=timedelta(hours=1))
             return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2]}), 200
         else:
             return jsonify({"error": "Sai username/email hoặc password"}), 401
@@ -109,7 +110,7 @@ def forgot_password():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    cursor.execute("SELECT * FROM customers WHERE email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
 
@@ -145,7 +146,7 @@ def reset_password():
     conn = get_db_connection()
     cursor = conn.cursor()
     query = """
-    UPDATE users 
+    UPDATE customers 
     SET 
         password = %s, 
         old_password_3 = old_password_2, 

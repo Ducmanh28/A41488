@@ -11,20 +11,17 @@
     </style>
 </head>
 <body>
-
-    <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="home.html">HotelBooking</a>
         </div>
     </nav>
 
-    <!-- Chi tiết khách sạn -->
     <div class="container hotel-container">
         <button class="btn btn-secondary back-btn" onclick="goBack()">⬅ Quay lại</button>
         <h2 class="text-center" id="hotel-name">Đang tải...</h2>
         <div class="card">
-            <div class="card-body">
+            <div class="card-body" id="hotel-details">
                 <p><strong>📍 Địa chỉ:</strong> <span id="hotel-address"></span></p>
                 <p><strong>📞 Hotline:</strong> <span id="hotel-hotline"></span></p>
                 <p><strong>📌 Khu vực:</strong> <span id="hotel-area"></span></p>
@@ -37,17 +34,16 @@
     </div>
 
     <script>
-        // Lấy hotel_id từ URL
         function getHotelIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get("hotel_id");
         }
 
-        // Gửi request lấy thông tin khách sạn
         async function fetchHotelDetails() {
             const hotelId = getHotelIdFromUrl();
             if (!hotelId) {
-                console.error("Không tìm thấy hotel_id trong URL");
+                document.getElementById("hotel-name").textContent = "Không tìm thấy khách sạn";
+                document.getElementById("hotel-details").innerHTML = "<p class='text-danger'>Vui lòng kiểm tra lại URL.</p>";
                 return;
             }
 
@@ -56,14 +52,12 @@
 
             try {
                 let response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error("Lỗi khi lấy dữ liệu khách sạn.");
-                }
+                if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu khách sạn.");
 
                 let hotel = await response.json();
+                if (!hotel.name) throw new Error("Không có dữ liệu hợp lệ.");
 
-                // Hiển thị thông tin khách sạn
-                document.getElementById("hotel-name").textContent = hotel.name || "Không xác định";
+                document.getElementById("hotel-name").textContent = hotel.name;
                 document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
                 document.getElementById("hotel-hotline").textContent = hotel.hotline || "Không có thông tin";
                 document.getElementById("hotel-area").textContent = hotel.area || "Không xác định";
@@ -71,9 +65,10 @@
                 document.getElementById("hotel-status").textContent = hotel.status || "Không rõ";
                 document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
                 document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
-
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu khách sạn:", error);
+                document.getElementById("hotel-name").textContent = "Lỗi tải dữ liệu";
+                document.getElementById("hotel-details").innerHTML = "<p class='text-danger'>Không thể lấy thông tin khách sạn.</p>";
             }
         }
 
@@ -81,9 +76,7 @@
             window.history.back();
         }
 
-        // Gọi hàm fetch dữ liệu
         fetchHotelDetails();
     </script>
-
 </body>
 </html>

@@ -21,7 +21,7 @@ def get_users(user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM customers WHERE id = %s",(user_id, ))
-    users = cursor.fetchall()
+    users = cursor.fetchone()
     cursor.close()
     conn.close()
     return jsonify(users)
@@ -37,10 +37,10 @@ def updated_users(user_id):
 
     # Duyệt qua các trường dữ liệu
     if "username" in data:
-        fields.append("customername = %s")
+        fields.append("username = %s")
         values.append(data["username"])
     if "phone" in data:
-        fields.append("phone = %s")
+        fields.append("phone_number = %s")
         values.append(data["phone"])
     if "email" in data:
         fields.append("email = %s")
@@ -65,7 +65,6 @@ def updated_users(user_id):
     # Ghép câu lệnh SQL
     query = f"UPDATE customers SET {', '.join(fields)} WHERE id = %s"
     values.append(user_id)
-
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -110,7 +109,7 @@ def get_invoices_of_user(user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM invoices WHERE customer_id = %s",(user_id, ))
-    history = cursor.fetchall()
+    history = cursor.fetchone()
     cursor.close()
     conn.close()
     return jsonify(history)

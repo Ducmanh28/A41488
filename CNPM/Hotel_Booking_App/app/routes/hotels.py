@@ -8,10 +8,9 @@ def get_hotel(hotel_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM hotels WHERE id = %s",(hotel_id, ))
-    hotels = cursor.fetchall()
+    hotels = cursor.fetchone()
     cursor.close()
     conn.close()
-
     return jsonify(hotels)
 @hotels_bp.route("/hotels", methods=["GET"])
 def get_all_hotels():
@@ -24,14 +23,12 @@ def get_all_hotels():
 
     return jsonify(hotels)
 @hotels_bp.route("/hotels/find", methods=["POST"])
-@jwt_required()
 def find_hotel():
     data = request.json
     area = data.get("area")
     check_in = data.get("check_in")
     check_out = data.get("check_out")
     status = "Available"
-    print(data)
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -75,5 +72,13 @@ def find_hotel():
     conn.close()
     print(available_hotels)
     return jsonify(available_hotels)
-
+@hotels_bp.route("/hotels/<int:hotel_id>/roomtypes",methods=["GET"])
+def get_roomtypes_of_hotels(hotel_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * from roomtypes WHERE hotel_id = %s",(hotel_id, ))
+    hotels = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(hotels)
     

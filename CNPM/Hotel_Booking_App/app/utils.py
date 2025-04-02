@@ -41,5 +41,11 @@ def is_valid_password(password):
     return len(password) > 8 and re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
 def get_userid_from_token():
     """Lấy user_id từ JWT token của người dùng đã đăng nhập."""
-    user_id = get_jwt_identity()
+    user_name = get_jwt_identity()
+    conn = get_db_connection()
+    curosr = conn.cursor()
+    curosr.execute("SELECT id FROM customers WHERE username = %s",(user_name))
+    user_id = curosr.fetchone()
+    curosr.close()
+    conn.close()
     return user_id

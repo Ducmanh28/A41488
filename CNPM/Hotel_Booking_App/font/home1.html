@@ -25,6 +25,7 @@
             <a class="navbar-brand" href="home1.html">HotelBooking</a>
             <div class="ms-auto">
                 <a href="user.html" class="btn btn-outline-light me-2">Thông tin cá nhân</a>
+                <a href="home.html" class="btn btn-outline-light me-2">Đăng Xuất</a>
             </div>
         </div>
     </nav>
@@ -91,28 +92,69 @@
             window.location.href = `hotel_info.html?hotel_id=${hotelId}`;
         }
 
-        function searchHotels() {
+        async function searchHotels() {
             let area = document.getElementById("area").value;
             let checkin = document.getElementById("checkin").value;
             let checkout = document.getElementById("checkout").value;
-
-            // Chuyển định dạng ngày về mm-dd-yyyy
-            checkin = formatDate(checkin);
-            checkout = formatDate(checkout);
-
-            let queryParams = `?area=${encodeURIComponent(area)}&checkin=${checkin}&checkout=${checkout}`;
-            fetchHotels(queryParams);
+        
+            let requestBody = {
+                area: area,
+                check_in: checkin,
+                check_out: checkout
+            };
+        
+            try {
+                let response = await fetch("http://127.0.0.1:5000/hotels/find", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`Lỗi từ server: ${response.status} - ${response.statusText}`);
+                }
+        
+                let hotels = await response.json();
+                console.log("Dữ liệu nhận được từ server:", hotels); // Debug
+        
+                displayHotels(hotels); // Hiển thị danh sách khách sạn
+        
+            } catch (error) {
+                console.error("Lỗi khi tìm khách sạn:", error);
+                document.getElementById("hotel-list").innerHTML = `<p class="text-center text-danger">Lỗi: ${error.message}</p>`;
+            }
         }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return "";
-            let date = new Date(dateStr);
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let day = String(date.getDate()).padStart(2, '0');
-            let year = date.getFullYear();
-            return `${month}-${day}-${year}`;
+        
+        function displayHotels(hotels) {
+            let hotelList = document.getElementById("hotel-list");
+            hotelList.innerHTML = ""; // Xóa nội dung cũ
+        
+            if (hotels.length === 0) {
+                hotelList.innerHTML = `<p class="text-center text-danger">Không tìm thấy khách sạn phù hợp.</p>`;
+                return;
+            }
+        
+            hotels.forEach(hotel => {
+                let hotelCard = document.createElement("div");
+                hotelCard.classList.add("col-md-4", "mb-4"); 
+        
+                hotelCard.innerHTML = `
+                    <div class="card hotel-card shadow-sm" onclick="redirectToHotel(${hotel.id})">
+                        <div class="card-body">
+                            <h5 class="card-title">${hotel.name}</h5>
+                            <p class="card-text">📍 <strong>Địa chỉ:</strong> ${hotel.address}</p>
+                            <p class="card-text">⭐ <strong>Đánh giá:</strong> ${hotel.rate} sao</p>
+                            <p class="card-text">📞 <strong>Hotline:</strong> ${hotel.hotline}</p>
+                            <p class="card-text">🏨 <strong>Trạng thái:</strong> ${hotel.status}</p>
+                        </div>
+                    </div>
+                `;
+        
+                hotelList.appendChild(hotelCard);
+            });
         }
-
         // Tải danh sách khách sạn ban đầu
         fetchHotels();
     </script>

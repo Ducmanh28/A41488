@@ -22,35 +22,12 @@
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="home.html">HotelBooking</a>
+            <a class="navbar-brand" href="home1.html">HotelBooking</a>
             <div class="ms-auto">
-                <a href="register.html" class="btn btn-outline-light me-2">Đăng ký</a>
-                <a href="login.html" class="btn btn-light">Đăng nhập</a>
+                <a href="home1.html" class="btn btn-outline-light me-2">Quay Lại</a>
             </div>
         </div>
     </nav>
-
-    <!-- Tìm kiếm khách sạn -->
-    <div class="container mt-4">
-        <h2 class="text-center">Tìm kiếm khách sạn</h2>
-        <form id="search-form" class="row g-3">
-            <div class="col-md-4">
-                <label for="area" class="form-label">Khu vực</label>
-                <input type="text" id="area" class="form-control" placeholder="Nhập khu vực">
-            </div>
-            <div class="col-md-3">
-                <label for="checkin" class="form-label">Ngày nhận phòng</label>
-                <input type="date" id="checkin" class="form-control">
-            </div>
-            <div class="col-md-3">
-                <label for="checkout" class="form-label">Ngày trả phòng</label>
-                <input type="date" id="checkout" class="form-control">
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="button" class="btn btn-primary w-100" onclick="searchHotels()">Tìm kiếm</button>
-            </div>
-        </form>
-    </div>
 
     <!-- Danh sách khách sạn -->
     <div class="container mt-4">
@@ -93,8 +70,16 @@
         }
 
         function searchHotels() {
-            alert("Vui lòng đăng nhập trước khi sử dụng tính năng tìm kiếm.");
-            window.location.href = "login.html";
+            let area = document.getElementById("area").value;
+            let checkin = document.getElementById("checkin").value;
+            let checkout = document.getElementById("checkout").value;
+
+            // Chuyển định dạng ngày về mm-dd-yyyy
+            checkin = formatDate(checkin);
+            checkout = formatDate(checkout);
+
+            let queryParams = `?area=${encodeURIComponent(area)}&checkin=${checkin}&checkout=${checkout}`;
+            fetchHotels(queryParams);
         }
 
         function formatDate(dateStr) {
