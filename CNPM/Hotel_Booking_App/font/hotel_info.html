@@ -8,6 +8,7 @@
     <style>
         .hotel-container { margin-top: 30px; }
         .back-btn { margin-bottom: 20px; }
+        .room-card { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -31,6 +32,12 @@
                 <p><strong>⭐ Đánh giá:</strong> <span id="hotel-review"></span></p>
             </div>
         </div>
+
+        <!-- Thêm phần hiển thị thông tin phòng -->
+        <div id="room-list" class="mt-5">
+            <h3 class="text-center">Danh sách phòng</h3>
+            <!-- Các phòng sẽ được hiển thị ở đây -->
+        </div>
     </div>
 
     <script>
@@ -46,17 +53,17 @@
                 document.getElementById("hotel-details").innerHTML = "<p class='text-danger'>Vui lòng kiểm tra lại URL.</p>";
                 return;
             }
-
+        
             const apiUrl = `http://127.0.0.1:5000/hotels/${hotelId}`;
             console.log("Fetching data from:", apiUrl);
-
+        
             try {
                 let response = await fetch(apiUrl);
                 if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu khách sạn.");
-
+        
                 let hotel = await response.json();
                 if (!hotel.name) throw new Error("Không có dữ liệu hợp lệ.");
-
+        
                 document.getElementById("hotel-name").textContent = hotel.name;
                 document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
                 document.getElementById("hotel-hotline").textContent = hotel.hotline || "Không có thông tin";
@@ -65,17 +72,69 @@
                 document.getElementById("hotel-status").textContent = hotel.status || "Không rõ";
                 document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
                 document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
+        
+                // Lấy thông tin các phòng
+                fetchRoomTypes(hotelId);
+        
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu khách sạn:", error);
                 document.getElementById("hotel-name").textContent = "Lỗi tải dữ liệu";
                 document.getElementById("hotel-details").innerHTML = "<p class='text-danger'>Không thể lấy thông tin khách sạn.</p>";
             }
         }
-
+        
+        async function fetchRoomTypes(hotelId) {
+            const roomApiUrl = `http://127.0.0.1:5000/hotels/${hotelId}/roomtypes`;
+            console.log("Fetching room types from:", roomApiUrl);
+        
+            try {
+                let response = await fetch(roomApiUrl);
+                if (!response.ok) throw new Error("Lỗi khi lấy thông tin phòng.");
+        
+                let rooms = await response.json();
+                if (rooms.length === 0) {
+                    document.getElementById("room-list").innerHTML = "<p class='text-center text-danger'>Không có phòng trong khách sạn này.</p>";
+                } else {
+                    displayRooms(rooms);
+                }
+        
+            } catch (error) {
+                console.error("Lỗi khi tải thông tin phòng:", error);
+                document.getElementById("room-list").innerHTML = "<p class='text-danger'>Không thể lấy thông tin phòng.</p>";
+            }
+        }
+        
+        function displayRooms(rooms) {
+            const roomList = document.getElementById("room-list");
+            rooms.forEach(room => {
+                let roomCard = document.createElement("div");
+                roomCard.classList.add("card", "room-card", "shadow-sm");
+        
+                roomCard.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${room.name}</h5>
+                        <p><strong>Loại giường:</strong> ${room.bed_type || "Chưa có thông tin"}</p>
+                        <p><strong>Sức chứa:</strong> ${room.capacity || "Chưa có thông tin"}</p>
+                        <p><strong>Đánh giá:</strong> ${room.rating || "Chưa có đánh giá"}</p>
+                        <p><strong>Tình trạng:</strong> Còn ${room.availability || "Hết phòng"} phòng</p>
+                        <p><strong>Dịch vụ:</strong> ${room.services || "Không có thông tin"}</p>
+                        <p><strong>Giá:</strong> ${room.price ? room.price + " VNĐ" : "Chưa có giá"}</p>
+                    </div>
+                `;
+        
+                roomList.appendChild(roomCard);
+            });
+        }
+        
+        function getHotelIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get("hotel_id");
+        }
+        
         function goBack() {
             window.history.back();
         }
-
+        
         fetchHotelDetails();
     </script>
 </body>
