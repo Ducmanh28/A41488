@@ -23,15 +23,17 @@ Là một ứng dụng đặt phòng khách sạn. Sử dụng ngôn ngữ lập
 - Xem:
   - Xem khách sạn: Hiển thị danh sách tất cả khách sạn
   - Tìm kiếm khách sạn: Nhập vào khu vực, ngày nhận phòng và trả phòng để tìm kiếm khách sạn
-  - Xem thông tin chi tiết của 1 khách sạn: Hiển thị toàn bộ thông tin của 1 khách sạn
-  - Xem thông tin loại phòng: Hiển thị danh sách các loại phòng của 1 khách sạn, các dịch vụ đi kèm theo
+  - Xem thông tin chi tiết của 1 khách sạn: Hiển thị toàn bộ thông tin của 1 khách sạn kèm danh sách các loại phòng
+  - Xem thông tin loại phòng: Hiển thị thông tin chi tiết của 1 loại phòng
   - Xem bảng thông tin các dịch vụ thêm như: đưa đón, ăn sáng, ăn tối,...
   - Xem hóa đơn trước khi thanh toán
+  - Xem thông tin cá nhân của mình, lịch sử mua hàng của người dùng
 - CRUD:
   - Người dùng có thể tạo 1 Hóa đơn: Hóa đơn được tạo bằng các thông tin về khách sạn, loại phòng, dịch vụ kèm theo, ngày nhận và trả phòng mà người dùng đã chọn trước đó
   - Người dùng có thể chỉnh sửa các thông tin hóa đơn của mình
   - Người dùng có thể hủy hóa đơn đó(khi chưa thanh toán)
   - Có thể thêm, thông tin cá nhân, sửa thông tin và xóa thông tin của mình
+  - Người dùng có thể hủy đơn mua hàng kể cả khi thanh toán xong nếu như đáp ứng điều kiện(Hủy trước 1 ngày so với ngày nhận phòng)
 
 # Database
 Mô hình database của ứng dụng

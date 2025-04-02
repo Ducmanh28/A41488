@@ -15,13 +15,61 @@
     <input type="text" id="full_name" placeholder="Họ và Tên"><br>
     <input type="text" id="citizen_id" placeholder="CCCD/CMND"><br>
     <button onclick="sendRegister()">Đăng Ký</button>
-
     <div id="otpSection" style="display:none;">
         <h3>Nhập mã OTP</h3>
         <input type="text" id="otp" placeholder="Nhập OTP"><br>
         <button onclick="confirmRegister()">Xác nhận</button>
     </div>
+    <script>
+        let userData = {};  // Lưu dữ liệu đăng ký để dùng lại sau khi nhập OTP
 
-    <script src="register.js"></script>
+        function sendRegister() {
+            userData = {
+                username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                phone_number: document.getElementById("phone").value,
+                full_name: document.getElementById("full_name").value,
+                citizen_id: document.getElementById("citizen_id").value
+            };
+
+            fetch("http://127.0.0.1:5000/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    document.getElementById("otpSection").style.display = "block"; // Hiện ô nhập OTP
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function confirmRegister() {
+            let otp = document.getElementById("otp").value;
+            userData.otp = otp;  // Thêm OTP vào dữ liệu đăng ký
+
+            fetch("http://127.0.0.1:5000/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert("Đăng ký thành công!");
+                    window.location.href = "login.html"; // Chuyển hướng đến trang đăng nhập
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
 </body>
 </html>

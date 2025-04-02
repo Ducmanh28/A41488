@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
 from db import get_db_connection
 
 hotels_bp = Blueprint("hotels", __name__)
@@ -29,7 +28,7 @@ def find_hotel():
     check_in = data.get("check_in")
     check_out = data.get("check_out")
     status = "Available"
-
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -70,7 +69,6 @@ def find_hotel():
 
     cursor.close()
     conn.close()
-    print(available_hotels)
     return jsonify(available_hotels)
 @hotels_bp.route("/hotels/<int:hotel_id>/roomtypes",methods=["GET"])
 def get_roomtypes_of_hotels(hotel_id):
@@ -89,4 +87,11 @@ def get_room_info(roomtypes_id):
     data = cursor.fetchone()
     cursor.close()
     conn.close()
+    return jsonify(data)
+@hotels_bp.route("/additionalservices",methods=["GET"])
+def get_addtional_services():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM additionalservices")
+    data = cursor.fetchall()
     return jsonify(data)
