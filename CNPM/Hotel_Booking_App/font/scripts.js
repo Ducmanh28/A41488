@@ -29,9 +29,15 @@ function register() {
 
 // Đăng nhập
 function login() {
+    const usernameOrEmail = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    // Kiểm tra nếu là email (sử dụng biểu thức chính quy để kiểm tra email)
+    const isEmail = /\S+@\S+\.\S+/.test(usernameOrEmail);
+
     const data = {
-        username: document.getElementById("username").value,
-        password: document.getElementById("password").value
+        [isEmail ? 'email' : 'username']: usernameOrEmail,
+        password: password
     };
 
     fetch(`${API_URL}/login`, {
@@ -50,6 +56,7 @@ function login() {
     })
     .catch(error => console.error("Lỗi:", error));
 }
+
 async function fetchHotels() {
     try {
         let response = await fetch("http://127.0.0.1:5000/hotels");

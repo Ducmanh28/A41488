@@ -29,7 +29,7 @@ def send_email(receiver_email, otp_code):
 def get_old_passwords(email):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT password, old_password_1, old_password_2 FROM users WHERE email = %s", (email,))
+    cursor.execute("SELECT password, old_password_1, old_password_2 FROM customers WHERE email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
     conn.close()

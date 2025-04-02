@@ -7,11 +7,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         .hotel-container { margin-top: 30px; }
-        .back-btn { margin-bottom: 20px; }
         .room-card { margin-top: 20px; }
-        .room-details { display: none; margin-top: 20px; }
-        .room-details .card-body { background-color: #f8f9fa; }
-        .room-details .close-btn { text-align: right; cursor: pointer; }
+        .room-img { width: 100%; height: 200px; object-fit: cover; }
+        .room-info { padding: 15px; }
     </style>
 </head>
 <body>
@@ -22,8 +20,9 @@
     </nav>
 
     <div class="container hotel-container">
-        <button class="btn btn-secondary back-btn" onclick="goBack()">⬅ Quay lại</button>
+        <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
         <h2 class="text-center" id="hotel-name">Đang tải...</h2>
+
         <div class="card">
             <div class="card-body" id="hotel-details">
                 <p><strong>📍 Địa chỉ:</strong> <span id="hotel-address"></span></p>
@@ -33,15 +32,34 @@
                 <p><strong>🏨 Trạng thái:</strong> <span id="hotel-status"></span></p>
                 <p><strong>📝 Mô tả:</strong> <span id="hotel-description"></span></p>
                 <p><strong>⭐ Đánh giá:</strong> <span id="hotel-review"></span></p>
-                <!-- Thêm nút Xem phòng -->
                 <a href="#room-list" class="btn btn-primary">Xem phòng</a>
             </div>
         </div>
 
-        <!-- Thêm phần hiển thị thông tin phòng -->
+        <!-- Danh sách phòng -->
         <div id="room-list" class="mt-5">
             <h3 class="text-center">Danh sách phòng</h3>
-            <!-- Các phòng sẽ được hiển thị ở đây -->
+            <div id="room-container" class="row"></div>
+        </div>
+    </div>
+
+    <!-- Modal Chi Tiết Phòng -->
+    <div class="modal fade" id="roomDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="room-title">Chi tiết phòng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="room-img" class="img-fluid mb-3" src="" alt="Room Image">
+                    <p><strong>📏 Diện tích:</strong> <span id="room-size"></span> m²</p>
+                    <p><strong>👥 Sức chứa:</strong> <span id="room-capacity"></span> người</p>
+                    <p><strong>🛏 Loại giường:</strong> <span id="room-bed"></span></p>
+                    <p><strong>🛎 Tiện nghi:</strong> <span id="room-services"></span></p>
+                    <p><strong>💰 Giá:</strong> <span id="room-price"></span> VNĐ</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -53,21 +71,13 @@
 
         async function fetchHotelDetails() {
             const hotelId = getHotelIdFromUrl();
-            if (!hotelId) {
-                document.getElementById("hotel-name").textContent = "Không tìm thấy khách sạn";
-                document.getElementById("hotel-details").innerHTML = "<p class='text-danger'>Vui lòng kiểm tra lại URL.</p>";
-                return;
-            }
+            if (!hotelId) return;
 
             const apiUrl = `http://127.0.0.1:5000/hotels/${hotelId}`;
-            console.log("Fetching data from:", apiUrl);
 
             try {
                 let response = await fetch(apiUrl);
-                if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu khách sạn.");
-
                 let hotel = await response.json();
-                if (!hotel.name) throw new Error("Không có dữ liệu hợp lệ.");
 
                 document.getElementById("hotel-name").textContent = hotel.name;
                 document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
@@ -78,102 +88,72 @@
                 document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
                 document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
 
-                // Lấy thông tin các phòng
                 fetchRoomTypes(hotelId);
-
             } catch (error) {
-                console.error("Lỗi khi tải dữ liệu khách sạn:", error);
-                document.getElementById("hotel-name").textContent = "Lỗi tải dữ liệu";
-                document.getElementById("hotel-details").innerHTML = "<p class='text-danger'>Không thể lấy thông tin khách sạn.</p>";
+                console.error("Lỗi tải dữ liệu khách sạn:", error);
             }
         }
 
         async function fetchRoomTypes(hotelId) {
             const roomApiUrl = `http://127.0.0.1:5000/hotels/${hotelId}/roomtypes`;
-            console.log("Fetching room types from:", roomApiUrl);
 
             try {
                 let response = await fetch(roomApiUrl);
-                if (!response.ok) throw new Error("Lỗi khi lấy thông tin phòng.");
-
                 let rooms = await response.json();
-                if (rooms.length === 0) {
-                    document.getElementById("room-list").innerHTML = "<p class='text-center text-danger'>Không có phòng trong khách sạn này.</p>";
-                } else {
-                    displayRooms(rooms);
-                }
 
+                displayRooms(rooms);
             } catch (error) {
-                console.error("Lỗi khi tải thông tin phòng:", error);
-                document.getElementById("room-list").innerHTML = "<p class='text-danger'>Không thể lấy thông tin phòng.</p>";
+                console.error("Lỗi tải thông tin phòng:", error);
             }
         }
 
         function displayRooms(rooms) {
-            const roomList = document.getElementById("room-list");
+            const roomContainer = document.getElementById("room-container");
+            roomContainer.innerHTML = "";
+
             rooms.forEach(room => {
                 let roomCard = document.createElement("div");
-                roomCard.classList.add("card", "room-card", "shadow-sm");
+                roomCard.classList.add("col-md-4");
 
                 roomCard.innerHTML = `
-                    <div class="card-body">
-                        <h5 class="card-title">${room.name}</h5>
-                        <p><strong>Loại giường:</strong> ${room.bed_type || "Chưa có thông tin"}</p>
-                        <p><strong>Sức chứa:</strong> ${room.capacity || "Chưa có thông tin"}</p>
-                        <p><strong>Đánh giá:</strong> ${room.rating || "Chưa có đánh giá"}</p>
-                        <p><strong>Tình trạng:</strong> Còn ${room.availability} phòng</p>
-                        <p><strong>Dịch vụ:</strong> ${room.services || "Không có thông tin"}</p>
-                        <p><strong>Giá:</strong> ${room.price ? room.price + " VNĐ" : "Chưa có giá"}</p>
-
-                        <!-- Nút "Chọn" -->
-                        <button class="btn btn-success" onclick="selectRoom(${room.id})">Chọn</button>
-
-                        <!-- Nút "Xem thông tin chi tiết" -->
-                        <button class="btn btn-info" onclick="viewRoomDetails(${room.id})">Xem thông tin chi tiết</button>
-
-                        <!-- Phần hiển thị thông tin chi tiết phòng -->
-                        <div id="room-details-${room.id}" class="room-details">
-                            <div class="card">
-                                <div class="card-body">
-                                    <span class="close-btn" onclick="toggleRoomDetails(${room.id})">❌</span>
-                                    <p><strong>Loại giường:</strong> ${room.bed_type}</p>
-                                    <p><strong>Sức chứa:</strong> ${room.capacity}</p>
-                                    <p><strong>Tình trạng:</strong> Còn ${room.availability} phòng</p>
-                                    <p><strong>Dịch vụ:</strong> ${room.services || "Không có thông tin"}</p>
-                                    <p><strong>Giá:</strong> ${room.price} VNĐ</p>
-                                </div>
-                            </div>
+                    <div class="card room-card shadow-sm">
+                        <img src="${room.image || 'default-room.jpg'}" class="room-img" alt="${room.name}">
+                        <div class="room-info">
+                            <h5>${room.name}</h5>
+                            <p><strong>Giá:</strong> ${room.price} VNĐ</p>
+                            <button class="btn btn-info" onclick="viewRoomDetails(${room.id})">Xem chi tiết</button>
+                            <button class="btn btn-success" onclick="selectRoom(${room.id})">Chọn</button>
                         </div>
                     </div>
                 `;
 
-                roomList.appendChild(roomCard);
+                roomContainer.appendChild(roomCard);
             });
         }
 
+        async function viewRoomDetails(roomId) {
+            const apiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
+
+            try {
+                let response = await fetch(apiUrl);
+                let room = await response.json();
+
+                document.getElementById("room-title").textContent = room.name;
+                document.getElementById("room-img").src = room.image || "default-room.jpg";
+                document.getElementById("room-size").textContent = room.size;
+                document.getElementById("room-capacity").textContent = room.capacity;
+                document.getElementById("room-bed").textContent = room.bed_type;
+                document.getElementById("room-services").textContent = room.services || "Không có thông tin";
+                document.getElementById("room-price").textContent = room.price;
+
+                new bootstrap.Modal(document.getElementById("roomDetailModal")).show();
+            } catch (error) {
+                console.error("Lỗi lấy thông tin phòng:", error);
+            }
+        }
+
         function selectRoom(roomId) {
-            // Chuyển hướng tới trang invoices.html
             window.location.href = `invoices.html?room_id=${roomId}`;
-        }
-
-        function viewRoomDetails(roomId) {
-            const hotelId = getHotelIdFromUrl();
-            const roomDetailsApiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
-
-            fetch(roomDetailsApiUrl)
-                .then(response => response.json())
-                .then(roomDetails => {
-                    alert("Thông tin chi tiết phòng: " + JSON.stringify(roomDetails));
-                })
-                .catch(error => {
-                    console.error("Lỗi khi lấy thông tin chi tiết phòng:", error);
-                    alert("Không thể lấy thông tin chi tiết phòng.");
-                });
-        }
-
-        function toggleRoomDetails(roomId) {
-            const details = document.getElementById(`room-details-${roomId}`);
-            details.style.display = (details.style.display === "block") ? "none" : "block";
         }
 
         function goBack() {
@@ -182,5 +162,6 @@
 
         fetchHotelDetails();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
