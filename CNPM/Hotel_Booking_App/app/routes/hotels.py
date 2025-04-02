@@ -81,4 +81,12 @@ def get_roomtypes_of_hotels(hotel_id):
     cursor.close()
     conn.close()
     return jsonify(hotels)
-    
+@hotels_bp.route("/roomtypes/<int:roomtypes_id>",methods=["GET"])
+def get_room_info(roomtypes_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM roomtypes WHERE id = %s",(roomtypes_id, ))
+    data = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(data)
