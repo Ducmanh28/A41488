@@ -3,23 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <title>Đăng Ký</title>
 </head>
 <body>
-    <h2>Đăng Ký</h2>
-    <input type="text" id="username" placeholder="Tên đăng nhập"><br>
-    <input type="email" id="email" placeholder="Email"><br>
-    <input type="password" id="password" placeholder="Mật khẩu"><br>
-    <input type="text" id="phone" placeholder="Số điện thoại"><br>
-    <input type="text" id="full_name" placeholder="Họ và Tên"><br>
-    <input type="text" id="citizen_id" placeholder="CCCD/CMND"><br>
-    <button onclick="sendRegister()">Đăng Ký</button>
-    <div id="otpSection" style="display:none;">
-        <h3>Nhập mã OTP</h3>
-        <input type="text" id="otp" placeholder="Nhập OTP"><br>
-        <button onclick="confirmRegister()">Xác nhận</button>
+
+    <!-- Thanh điều hướng -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">HotelBooking</a>
+            <div class="ms-auto">
+                <a href="register.html" class="btn btn-light">Đăng ký</a>
+                <a href="login.html" class="btn btn-outline-light me-2">Đăng nhập</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Form Đăng Ký -->
+    <div class="container" style="max-width: 500px; margin-top: 50px;">
+        <h2 class="text-center mb-4">Đăng Ký</h2>
+        <form id="registerForm">
+
+            <!-- Tên đăng nhập -->
+            <label for="username" class="form-label">Tên đăng nhập</label>
+            <input type="text" id="username" class="form-control" placeholder="Nhập tên đăng nhập" required><br>
+
+            <!-- Email -->
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Nhập email" required><br>
+
+            <!-- Mật khẩu -->
+            <label for="password" class="form-label">Mật khẩu</label>
+            <input type="password" id="password" class="form-control" placeholder="Nhập mật khẩu" required><br>
+
+            <!-- Số điện thoại -->
+            <label for="phone" class="form-label">Số điện thoại</label>
+            <input type="text" id="phone" class="form-control" placeholder="Nhập số điện thoại" required><br>
+
+            <!-- Họ và tên -->
+            <label for="full_name" class="form-label">Họ và Tên</label>
+            <input type="text" id="full_name" class="form-control" placeholder="Nhập họ và tên" required><br>
+
+            <!-- CCCD/CMND -->
+            <label for="citizen_id" class="form-label">CCCD/CMND</label>
+            <input type="text" id="citizen_id" class="form-control" placeholder="Nhập CCCD/CMND" required><br>
+
+            <!-- Nút Đăng Ký -->
+            <button type="button" class="btn btn-primary w-100" onclick="sendRegister()">Đăng Ký</button>
+        </form>
+
+        <!-- Phần OTP -->
+        <div id="otpSection" style="display:none;">
+            <h3 class="text-center mt-4">Nhập mã OTP</h3>
+            <input type="text" id="otp" class="form-control" placeholder="Nhập OTP"><br>
+            <button onclick="confirmRegister()" class="btn btn-success w-100">Xác nhận</button>
+        </div>
+
     </div>
+
+    <!-- Thêm Bootstrap JS từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         let userData = {};  // Lưu dữ liệu đăng ký để dùng lại sau khi nhập OTP
 
@@ -71,5 +115,6 @@
             .catch(error => console.error("Error:", error));
         }
     </script>
+
 </body>
 </html>
