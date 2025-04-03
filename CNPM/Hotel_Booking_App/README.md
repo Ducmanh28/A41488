@@ -1,16 +1,4 @@
-# Góp ý của giáo viên
-- Thiết kế lại mô hình ứng dụng
-- Bỏ Role
-- Admin tự thêm khách sạn
-- Khách hàng chỉ có thể tạo Booking
-- Lưu ý về các dịch vụ đi kèm ví dụ như số người đi, loại phòng
-- ĐẶT HỘ, ĐẶT NHIỀU CÙNG 1 LÚC
-# Công việc cần làm hàng tuần
-## Tuần 6
-- Thiết kế lại hướng đi cho ứng dụng
-- Thêm database mẫu
-- Thiết kế API thanh toán
-
+# HOTEL BOOKING APP
 # Mô tả ứng dụng
 Là một ứng dụng đặt phòng khách sạn. Sử dụng ngôn ngữ lập trình Python và cơ sở dữ liệu MySql làm database để thiết kế hệ thống phần back end.
 
@@ -56,3 +44,6 @@ Ban đầu người dùng sẽ cần đăng ký, sau đó đăng nhập vào h�
 - Xem lại hóa đơn
 - Thanh toán trước 70% của hóa đơn(MOMO)
 - Thanh toán thành công! Xác nhận đặt phòng!
+
+# Truy cập:
+Truy cập trang web tại [đây](https://ducmanhsuncloud.click/)
