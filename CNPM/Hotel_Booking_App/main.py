@@ -20,4 +20,4 @@ app.register_blueprint(hotels_bp)
 app.register_blueprint(invoices_bp)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="192.168.1.43", port=5000, debug=True)
