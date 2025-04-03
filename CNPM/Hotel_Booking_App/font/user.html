@@ -119,6 +119,7 @@
             </div>
         </div>
     </nav>
+    <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
     <h2>Thông tin cá nhân</h2>
 
     <!-- Hiển thị thông tin người dùng -->
@@ -160,7 +161,7 @@
         const accessToken = localStorage.getItem('access_token');
 
         // Yêu cầu GET để lấy thông tin người dùng từ backend
-        fetch(`http://127.0.0.1:5000/customers/${userId}`, {
+        fetch(`https://api.ducmanhsuncloud.click/customers/${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -212,7 +213,7 @@
             const newAddress = document.getElementById('new_address').value || localStorage.getItem('current_address');
 
             // Gửi yêu cầu cập nhật thông tin đến API backend
-            fetch(`http://127.0.0.1:5000/customers/${userId}`, {
+            fetch(`https://api.ducmanhsuncloud.click/customers/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -258,6 +259,9 @@
                 alert('Không thể cập nhật thông tin người dùng');
             });
         });
+        function goBack() {
+            window.history.back();
+        }
     </script>
 
 </body>

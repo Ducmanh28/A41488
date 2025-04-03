@@ -54,7 +54,7 @@
     <script>
         async function fetchHotels(queryParams = "") {
             try {
-                let response = await fetch(`http://127.0.0.1:5000/hotels${queryParams}`);
+                let response = await fetch(`https://api.ducmanhsuncloud.click/hotels${queryParams}`);
                 let hotels = await response.json();
 
                 let hotelList = document.getElementById("hotel-list");
@@ -105,7 +105,7 @@
                 check_out: checkout
             };
             try {
-                let response = await fetch("http://127.0.0.1:5000/hotels/find", {
+                let response = await fetch("https://api.ducmanhsuncloud.click/hotels/find", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

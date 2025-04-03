@@ -73,7 +73,7 @@
             const hotelId = getHotelIdFromUrl();
             if (!hotelId) return;
 
-            const apiUrl = `http://127.0.0.1:5000/hotels/${hotelId}`;
+            const apiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}`;
 
             try {
                 let response = await fetch(apiUrl);
@@ -95,7 +95,7 @@
         }
 
         async function fetchRoomTypes(hotelId) {
-            const roomApiUrl = `http://127.0.0.1:5000/hotels/${hotelId}/roomtypes`;
+            const roomApiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}/roomtypes`;
 
             try {
                 let response = await fetch(roomApiUrl);
@@ -132,7 +132,7 @@
         }
 
         async function viewRoomDetails(roomId) {
-            const apiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
+            const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
 
             try {
                 let response = await fetch(apiUrl);
@@ -153,7 +153,7 @@
         }
 
         function selectRoom(roomId) {
-            window.location.href = `invoices.html?room_id=${roomId}`;
+            window.location.href = `additionalservices.html`;
         }
 
         function goBack() {
