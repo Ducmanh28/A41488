@@ -40,12 +40,23 @@ def is_valid_password(password):
     """Kiểm tra mật khẩu phải trên 8 ký tự và chứa ít nhất 1 ký tự đặc biệt"""
     return len(password) > 8 and re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
 def get_userid_from_token():
-    """Lấy user_id từ JWT token của người dùng đã đăng nhập."""
     user_name = get_jwt_identity()
     conn = get_db_connection()
     curosr = conn.cursor()
-    curosr.execute("SELECT id FROM customers WHERE username = %s",(user_name))
+    curosr.execute("SELECT id FROM customers WHERE username = %s",(user_name, ))
     user_id = curosr.fetchone()
     curosr.close()
     conn.close()
-    return user_id
+    if user_id:
+        return user_id[0]
+    return None
+def get_hotel_id_from_room_id(room_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT hotel_id FROM roomtypes WHERE id = %s", (room_id, ))
+    hotel_id_tuple = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if hotel_id_tuple:
+        return hotel_id_tuple[0]
+    return None

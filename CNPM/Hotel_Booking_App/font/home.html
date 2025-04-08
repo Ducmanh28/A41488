@@ -54,7 +54,7 @@
     <script>
         async function fetchHotels(queryParams = "") {
             try {
-                let response = await fetch(`https://api.ducmanhsuncloud.click/hotels${queryParams}`);
+                let response = await fetch(`http://192.168.1.43:5000/hotels${queryParams}`);
                 let hotels = await response.json();
 
                 let hotelList = document.getElementById("hotel-list");
@@ -64,7 +64,7 @@
                     let hotelCard = document.createElement("div");
                     hotelCard.className = "col-md-4";
                     hotelCard.innerHTML = `
-                        <div class="card hotel-card" onclick="redirectToHotel(${hotel.id})">
+                        <div class="card hotel-card" onclick="redirectToHotel()">
                             <div class="card-body">
                                 <h5 class="card-title">${hotel.name}</h5>
                                 <p class="card-text">📍 Địa chỉ: ${hotel.address}</p>
@@ -81,7 +81,8 @@
             }
         }
         function redirectToHotel(hotelId) {
-            window.location.href = `hotel_info.html?hotel_id=${hotelId}`;
+            alert("Vui lòng đăng nhập trước khi sử dụng tính năng xem khách sạn");
+            window.location.href = "login.html";
         }
         function searchHotels() {
             alert("Vui lòng đăng nhập trước khi sử dụng tính năng tìm kiếm.");

@@ -38,7 +38,7 @@
                 [isEmail ? 'email' : 'username']: usernameOrEmail,
                 password: password
             };
-            fetch(`https://api.ducmanhsuncloud.click/login`, {
+            fetch(`http://192.168.1.43:5000/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)

@@ -58,6 +58,7 @@
                     <p><strong>🛏 Loại giường:</strong> <span id="room-bed"></span></p>
                     <p><strong>🛎 Tiện nghi:</strong> <span id="room-services"></span></p>
                     <p><strong>💰 Giá:</strong> <span id="room-price"></span> VNĐ</p>
+                    <p><strong>   Còn Trống:</strong> <span id="room-availability"></span> phòng</p>
                 </div>
             </div>
         </div>
@@ -71,14 +72,19 @@
 
         async function fetchHotelDetails() {
             const hotelId = getHotelIdFromUrl();
-            if (!hotelId) return;
-
-            const apiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}`;
-
+            if (hotelId) {
+                console.log(hotelId); 
+            } else {
+                console.error("Không có hotelid");
+                return;
+            }
+        
+            const apiUrl = `http://192.168.1.43:5000/hotels/${hotelId}`;
+        
             try {
                 let response = await fetch(apiUrl);
                 let hotel = await response.json();
-
+        
                 document.getElementById("hotel-name").textContent = hotel.name;
                 document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
                 document.getElementById("hotel-hotline").textContent = hotel.hotline || "Không có thông tin";
@@ -87,15 +93,14 @@
                 document.getElementById("hotel-status").textContent = hotel.status || "Không rõ";
                 document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
                 document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
-
-                fetchRoomTypes(hotelId);
+                fetchRoomTypes(hotelId);  
             } catch (error) {
                 console.error("Lỗi tải dữ liệu khách sạn:", error);
             }
         }
 
         async function fetchRoomTypes(hotelId) {
-            const roomApiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}/roomtypes`;
+            const roomApiUrl = `http://192.168.1.43:5000/hotels/${hotelId}/roomtypes`;
 
             try {
                 let response = await fetch(roomApiUrl);
@@ -121,6 +126,7 @@
                         <div class="room-info">
                             <h5>${room.name}</h5>
                             <p><strong>Giá:</strong> ${room.price} VNĐ</p>
+                            <p><strong>Còn trống:</strong> ${room.availability} phòng</p>
                             <button class="btn btn-info" onclick="viewRoomDetails(${room.id})">Xem chi tiết</button>
                             <button class="btn btn-success" onclick="selectRoom(${room.id})">Chọn</button>
                         </div>
@@ -132,7 +138,7 @@
         }
 
         async function viewRoomDetails(roomId) {
-            const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
+            const apiUrl = `http://192.168.1.43:5000/roomtypes/${roomId}`;
 
             try {
                 let response = await fetch(apiUrl);
@@ -140,11 +146,12 @@
 
                 document.getElementById("room-title").textContent = room.name;
                 document.getElementById("room-img").src = room.image || "default-room.jpg";
-                document.getElementById("room-size").textContent = room.size;
+                document.getElementById("room-size").textContent = room.area;
                 document.getElementById("room-capacity").textContent = room.capacity;
                 document.getElementById("room-bed").textContent = room.bed_type;
                 document.getElementById("room-services").textContent = room.services || "Không có thông tin";
                 document.getElementById("room-price").textContent = room.price;
+                document.getElementById("room-availability").textContent = room.availability;
 
                 new bootstrap.Modal(document.getElementById("roomDetailModal")).show();
             } catch (error) {
@@ -152,9 +159,25 @@
             }
         }
 
-        function selectRoom(roomId) {
-            window.location.href = `additionalservices.html`;
+        async function selectRoom(roomId) {
+            try {
+                const apiUrl = `http://192.168.1.43:5000/roomtypes/${roomId}`;
+                let response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Không thể lấy dữ liệu phòng.");
+        
+                let room = await response.json();
+                console.log(room.availability)
+                if (room.availability > 0) {
+                    window.location.href = `additionalservices.html?room_type_id=${roomId}`;
+                } else {
+                    alert("Phòng này đã hết, không thể chọn.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi chọn phòng:", error);
+                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+            }
         }
+        
 
         function goBack() {
             window.history.back();

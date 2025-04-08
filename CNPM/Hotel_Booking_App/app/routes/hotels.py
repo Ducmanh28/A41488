@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from db import get_db_connection
+from app.utils import get_hotel_id_from_room_id
 
 hotels_bp = Blueprint("hotels", __name__)
 @hotels_bp.route("/hotels/<int:hotel_id>", methods=["GET"])
@@ -82,7 +83,7 @@ def get_roomtypes_of_hotels(hotel_id):
 @hotels_bp.route("/roomtypes/<int:roomtypes_id>",methods=["GET"])
 def get_room_info(roomtypes_id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM roomtypes WHERE id = %s",(roomtypes_id, ))
     data = cursor.fetchone()
     cursor.close()
@@ -95,3 +96,24 @@ def get_addtional_services():
     cursor.execute("SELECT * FROM additionalservices")
     data = cursor.fetchall()
     return jsonify(data)
+@hotels_bp.route("/name_of_hotel/<int:room_type_id>",methods=["GET"])
+def get_name_of_hotel(room_type_id):
+    hotel_id = get_hotel_id_from_room_id(room_type_id)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM hotels WHERE id = %s",(hotel_id, ))
+    name = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(name)
+@hotels_bp.route("/name_of_roomtype/<int:room_type_id>",methods=["GET"])
+def get_name_of_roomtype(room_type_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM roomtypes WHERE id = %s",(room_type_id, ))
+    name = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(name)
+
+

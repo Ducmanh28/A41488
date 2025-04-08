@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn Đặt Phòng</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">HotelBooking</a>
+            <div class="ms-auto">
+                <a href="user.html" class="btn btn-outline-light me-2">Thông tin cá nhân</a>
+                <a href="home.html" class="btn btn-outline-light me-2">Đăng Xuất</a>
+            </div>
+        </div>
+    </nav>
+    <p></p>
+    <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
+    <div class="container" style="max-width: 800px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-top: 30px;">
+        <h2 style="text-align: center;">Thông Tin Đặt Phòng</h2>
+        <div>
+            <p><strong>Tên Phòng:</strong> <span id="roomTypeId">Đang tải...</span></p>
+            <p><strong>Tên Khách Sạn:</strong> <span id="hotelName">Đang tải...</span></p>
+            <h4>Dịch vụ bổ sung đã chọn:</h4>
+            <ul id="additionalServicesList" class="list-group" style="margin-top: 20px;"></ul>
+        </div>
+
+        <form id="invoiceForm">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="checkinDate" style="font-weight: bold;">Ngày Check-in:</label>
+                <input type="date" id="checkinDate" class="form-control" required>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="checkoutDate" style="font-weight: bold;">Ngày Check-out:</label>
+                <input type="date" id="checkoutDate" class="form-control" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="bookingFor" style="font-weight: bold;">Đặt cho:</label>
+                <select id="bookingFor" class="form-control" required>
+                    <option value="myself">Bản thân</option>
+                    <option value="someoneElse">Người khác</option>
+                </select>
+            </div>
+
+            <div id="otherPersonFields" class="form-group" style="margin-bottom: 15px; display: none;">
+                <label for="otherPersonName" style="font-weight: bold;">Tên người khác:</label>
+                <input type="text" id="otherPersonName" class="form-control" placeholder="Nhập tên người khác">
+            </div>
+            <div id="otherPersonCCID" class="form-group" style="margin-bottom: 15px; display: none;">
+                <label for="otherPersonCCID" style="font-weight: bold;">CCID người khác:</label>
+                <input type="text" id="otherPersonCCID" class="form-control" placeholder="Nhập CCID người khác">
+            </div>
+
+            <button type="submit" class="btn" style="background-color: #007bff; color: white; margin-top: 20px;">Xác nhận</button>
+        </form>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomTypeId = urlParams.get('room_type_id');
+        const additionalServices = JSON.parse(urlParams.get('additionalservices') || "[]");
+
+        // Hiển thị tên phòng
+        fetch(`http://192.168.1.43:5000/name_of_roomtype/${roomTypeId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    document.getElementById('roomTypeId').textContent = data[0];
+                } else {
+                    document.getElementById('roomTypeId').textContent = "Không tìm thấy tên phòng.";
+                }
+            })
+            .catch(err => {
+                console.error("Lỗi khi lấy tên phòng:", err);
+                document.getElementById('roomTypeId').textContent = "Không thể tải tên phòng.";
+            });
+
+        // Hiển thị tên khách sạn
+        fetch(`http://192.168.1.43:5000/name_of_hotel/${roomTypeId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    document.getElementById('hotelName').textContent = data[0];
+                } else {
+                    document.getElementById('hotelName').textContent = "Không tìm thấy tên khách sạn.";
+                }
+            })
+            .catch(err => {
+                console.error("Lỗi khi lấy tên khách sạn:", err);
+                document.getElementById('hotelName').textContent = "Không thể tải tên khách sạn.";
+            });
+
+        // Hiển thị danh sách dịch vụ bổ sung
+        const list = document.getElementById("additionalServicesList");
+        if (additionalServices.length > 0) {
+            additionalServices.forEach(service => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = service;
+                list.appendChild(li);
+            });
+        } else {
+            list.innerHTML = "<li class='list-group-item'>Không có dịch vụ bổ sung nào được chọn.</li>";
+        }
+
+        // Toggle hiển thị ô nhập nếu chọn người khác
+        document.getElementById('bookingFor').addEventListener('change', function () {
+            const isOther = this.value === 'someoneElse';
+            document.getElementById('otherPersonFields').style.display = isOther ? 'block' : 'none';
+            document.getElementById('otherPersonCCID').style.display = isOther ? 'block' : 'none';
+        });
+
+        // Xử lý gửi dữ liệu khi xác nhận
+        document.getElementById('invoiceForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const check_in = document.getElementById('checkinDate').value;
+            const check_out = document.getElementById('checkoutDate').value;
+            const bookingFor = document.getElementById('bookingFor').value;
+
+            let forwho = false;
+            let anothercustomer = null;
+            let anotherccid = null;
+
+            if (bookingFor === 'someoneElse') {
+                forwho = true;
+                anothercustomer = document.getElementById('otherPersonName').value.trim();
+                anotherccid = document.getElementById('otherPersonCCID').value.trim();
+
+                if (!anothercustomer || !anotherccid) {
+                    alert("Vui lòng nhập đầy đủ tên và CCID của người khác.");
+                    return;
+                }
+            }
+
+            const payload = {
+                room_type_id: roomTypeId,
+                check_in,
+                check_out,
+                additional_services: additionalServices,
+                forwho,
+                anothercustomer,
+                anotherccid
+            };
+            console.log(JSON.stringify(payload))
+            console.log(localStorage.getItem("access_token"))
+            try {
+                const response = await fetch('http://192.168.1.43:5000/invoices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("Đặt phòng thành công!");
+                    window.location.href = "payment.html";
+                } else {
+                    alert(result.error || "Đặt phòng thất bại.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi gửi yêu cầu:", error);
+                alert("Đã xảy ra lỗi khi gửi dữ liệu.");
+            }
+        });
+        function goBack() {
+            window.history.back();
+        };
+    </script>
+</body>
+</html>
