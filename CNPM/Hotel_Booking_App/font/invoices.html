@@ -46,11 +46,11 @@
                 </select>
             </div>
 
-            <div id="otherPersonFields" class="form-group" style="margin-bottom: 15px; display: none;">
+            <div class="form-group" style="margin-bottom: 15px; display: none;" id="otherPersonFieldsWrapper">
                 <label for="otherPersonName" style="font-weight: bold;">Tên người khác:</label>
                 <input type="text" id="otherPersonName" class="form-control" placeholder="Nhập tên người khác">
             </div>
-            <div id="otherPersonCCID" class="form-group" style="margin-bottom: 15px; display: none;">
+            <div class="form-group" style="margin-bottom: 15px; display: none;" id="otherPersonCCIDWrapper">
                 <label for="otherPersonCCID" style="font-weight: bold;">CCID người khác:</label>
                 <input type="text" id="otherPersonCCID" class="form-control" placeholder="Nhập CCID người khác">
             </div>
@@ -65,7 +65,7 @@
         const additionalServices = JSON.parse(urlParams.get('additionalservices') || "[]");
 
         // Hiển thị tên phòng
-        fetch(`http://192.168.1.43:5000/name_of_roomtype/${roomTypeId}`)
+        fetch(`http://127.0.0.1:5000/name_of_roomtype/${roomTypeId}`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
@@ -80,7 +80,7 @@
             });
 
         // Hiển thị tên khách sạn
-        fetch(`http://192.168.1.43:5000/name_of_hotel/${roomTypeId}`)
+        fetch(`http://127.0.0.1:5000/name_of_hotel/${roomTypeId}`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
@@ -110,8 +110,8 @@
         // Toggle hiển thị ô nhập nếu chọn người khác
         document.getElementById('bookingFor').addEventListener('change', function () {
             const isOther = this.value === 'someoneElse';
-            document.getElementById('otherPersonFields').style.display = isOther ? 'block' : 'none';
-            document.getElementById('otherPersonCCID').style.display = isOther ? 'block' : 'none';
+            document.getElementById('otherPersonFieldsWrapper').style.display = isOther ? 'block' : 'none';
+            document.getElementById('otherPersonCCIDWrapper').style.display = isOther ? 'block' : 'none';
         });
 
         // Xử lý gửi dữ liệu khi xác nhận
@@ -149,7 +149,7 @@
             console.log(JSON.stringify(payload))
             console.log(localStorage.getItem("access_token"))
             try {
-                const response = await fetch('http://192.168.1.43:5000/invoices', {
+                const response = await fetch('http://127.0.0.1:5000/invoices', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -161,8 +161,9 @@
                 const result = await response.json();
 
                 if (response.ok) {
+                    const invoiceId = result.invoice_id;
                     alert("Đặt phòng thành công!");
-                    window.location.href = "payment.html";
+                    window.location.href = `payment.html?invoice_id=${invoiceId}`;
                 } else {
                     alert(result.error || "Đặt phòng thất bại.");
                 }

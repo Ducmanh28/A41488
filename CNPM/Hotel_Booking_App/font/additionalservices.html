@@ -32,7 +32,7 @@
         const room_type_id = params.get("room_type_id");
         async function fetchServices() {
             try {
-                const response = await fetch("http://192.168.1.43:5000/additionalservices");
+                const response = await fetch("http://127.0.0.1:5000/additionalservices");
                 if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu");
 
                 const services = await response.json();

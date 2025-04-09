@@ -220,7 +220,7 @@
       }
   
       try {
-        const response = await fetch("http://192.168.1.43:5000/forgot-password", {
+        const response = await fetch("http://127.0.0.1:5000/forgot-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: email })
@@ -283,7 +283,7 @@
       }
   
       try {
-        const response = await fetch("http://192.168.1.43:5000/reset-password", {
+        const response = await fetch("http://127.0.0.1:5000/reset-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

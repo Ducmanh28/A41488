@@ -154,5 +154,38 @@ def delete_invoices(invoices_id):
     conn.close()
     
     return jsonify({"message": "Invoices deleted successfully"}), 201
+@invoices_bp.route("/invoices/<int:invoices_id>",methods=["GET"])
+@jwt_required()
+def get_invoices_by_id(invoices_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM invoices WHERE id = %s",(invoices_id, ))
+    data = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(data)
+@invoices_bp.route("/invoices/<int:invoices_id>/additionalservices", methods=["GET"])
+@jwt_required()
+def get_additionalservice_of_invoices(invoices_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
+    cursor.execute("SELECT service_id FROM invoice_additionalservices WHERE invoice_id = %s", (invoices_id,))
+    services_id = cursor.fetchall()
+
+    list_service = []
+    for service_id in services_id:
+        cursor.execute("SELECT service_name, price FROM additionalservices WHERE id = %s", (service_id["service_id"],))
+        service = cursor.fetchone()
+        if service:
+            list_service.append({
+                "service_name": service["service_name"],
+                "service_price": service["price"]
+            })
+    cursor.close()
+    conn.close()
+    return jsonify(list_service)
+        
+    
+    
     

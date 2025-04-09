@@ -161,7 +161,7 @@
         const accessToken = localStorage.getItem('access_token');
 
         // Yêu cầu GET để lấy thông tin người dùng từ backend
-        fetch(`http://192.168.1.43:5000/customers/${userId}`, {
+        fetch(`http://127.0.0.1:5000/customers/${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -213,7 +213,7 @@
             const newAddress = document.getElementById('new_address').value || localStorage.getItem('current_address');
 
             // Gửi yêu cầu cập nhật thông tin đến API backend
-            fetch(`http://192.168.1.43:5000/customers/${userId}`, {
+            fetch(`http://127.0.0.1:5000/customers/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

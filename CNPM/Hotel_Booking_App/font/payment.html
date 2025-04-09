@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">HotelBooking</a>
+            <div class="ms-auto">
+                <a href="user.html" class="btn btn-outline-light me-2">Thông tin cá nhân</a>
+                <a href="home.html" class="btn btn-outline-light me-2">Đăng Xuất</a>
+            </div>
+        </div>
+    </nav>
+    <p></p>
+    <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h2 class="text-center text-primary mb-4">Thông tin hóa đơn</h2>
+
+            <!-- Thông tin người đặt -->
+            <div id="userInfo" class="mb-4">
+                <h4>Thông tin người đặt</h4>
+                <p><strong>Tên người đặt:</strong> <span id="customerName"></span></p>
+                <p><strong>Ngày tạo đơn:</strong> <span id="createdAt"></span></p>
+                <p><strong>Đặt cho:</strong> <span id="forWho"></span></p>
+                <div id="someoneElseInfo" style="display: none;">
+                    <p><strong>Tên người được đặt:</strong> <span id="anotherCustomer"></span></p>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Thông tin đơn hàng -->
+            <div id="orderInfo" class="mb-4">
+                <h4>Thông tin đơn hàng</h4>
+                <p><strong>Khách sạn:</strong> <span id="hotelName"></span></p>
+                <p><strong>Địa chỉ:</strong> <span id="hotelAddress"></span></p>
+                <p><strong>Loại phòng:</strong> <span id="roomTypeName"></span></p>
+                <p><strong>Giá phòng:</strong> <span id="roomPrice"></span> VND</p>
+
+                <h5 class="mt-3">Dịch vụ thêm:</h5>
+                <ul id="additionalServicesList" class="list-group mb-3"></ul>
+
+                <p class="fw-bold">Tổng số tiền: <span id="totalPrice"></span> VND</p>
+                <p class="fw-bold text-danger">Cần thanh toán trước (70%): <span id="prepayAmount"></span> VND</p>
+            </div>
+
+            <hr>
+
+            <!-- Thanh toán -->
+            <div id="paymentMethods">
+                <h4 class="mb-3">Chọn phương thức thanh toán</h4>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <button class="btn btn-danger" onclick="goToPayment('vnpay')">Thanh toán bằng VNPAY</button>
+                    <button class="btn btn-primary" onclick="goToPayment('card')">Thanh toán bằng CARD</button>
+                    <button class="btn btn-pink" style="background-color: #d81b60; color: white;" onclick="goToPayment('momo')">Thanh toán bằng MoMo</button>
+                    <button class="btn btn-success" onclick="showQR()">Thanh toán bằng Tài khoản ngân hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div id="qrModal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background-color:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+    <div class="bg-white p-4 rounded text-center position-relative" style="max-width: 400px;">
+        <button onclick="hideQR()" style="position:absolute; top:10px; right:10px;" class="btn btn-sm btn-danger">X</button>
+        <h5 class="mb-3">Quét mã để thanh toán</h5>
+        <img src="your-bank-qr.png" alt="QR thanh toán" width="250" class="border p-2 rounded">
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const invoiceId = urlParams.get('invoice_id');
+    const token = localStorage.getItem('access_token');
+    async function authFetch(url) {
+        const res = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        return res.json();
+    }
+    async function loadInvoice() {
+        try {
+            const res = await authFetch(`http://127.0.0.1:5000/invoices/${invoiceId}`);
+            const invoice = await res;
+            const customerres = await authFetch(`http://127.0.0.1:5000/customers/${invoice.customer_id}`)
+            const customer = await customerres;
+            document.getElementById('customerName').textContent = customer.full_name;
+
+            const date = new Date(invoice.create_at);
+            date.setHours(date.getHours() - 7); // giờ VN
+            document.getElementById('createdAt').textContent = date.toLocaleString('vi-VN');
+
+            const isOther = invoice.is_for_someone_else;
+            document.getElementById('forWho').textContent = isOther ? "Người khác" : "Bản thân";
+            if (isOther) {
+                document.getElementById('anotherCustomer').textContent = invoice.other_person_name;
+                document.getElementById('someoneElseInfo').style.display = "block";
+            }
+
+            const hotelRes = await authFetch(`http://127.0.0.1:5000/hotels/${invoice.hotel_id}`);
+            const hotel = await hotelRes;
+            document.getElementById('hotelName').textContent = hotel.name;
+            document.getElementById('hotelAddress').textContent = hotel.address;
+
+            const roomRes = await authFetch(`http://127.0.0.1:5000/roomtypes/${invoice.room_type_id}`);
+            const room = await roomRes;
+            document.getElementById('roomTypeName').textContent = room.name;
+            document.getElementById('roomPrice').textContent = Number(room.price).toLocaleString('vi-VN');
+
+            const serviceRes = await authFetch(`http://127.0.0.1:5000/invoices/${invoiceId}/additionalservices`);
+            const services = await serviceRes;
+
+            const list = document.getElementById("additionalServicesList");
+            let serviceTotal = 0;
+            if (services.length > 0) {
+                services.forEach(service => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.textContent = `${service.service_name} - ${Number(service.service_price).toLocaleString('vi-VN')} VND`;
+                    list.appendChild(li);
+                    serviceTotal += Number(service.service_price);
+                });
+            } else {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = "Không có dịch vụ thêm";
+                list.appendChild(li);
+            }
+
+            const total = Number(room.price) + serviceTotal;
+            document.getElementById("totalPrice").textContent = total.toLocaleString('vi-VN');
+            document.getElementById("prepayAmount").textContent = Math.round(total * 0.7).toLocaleString('vi-VN');
+
+        } catch (err) {
+            console.error("Lỗi khi tải thông tin hóa đơn:", err);
+            alert("Không thể tải thông tin hóa đơn.");
+        }
+    }
+
+    function goToPayment(method) {
+        window.location.href = `${method}.html?invoices_id=${invoiceId}`;
+    }
+
+    function showQR() {
+        const modal = document.getElementById("qrModal");
+        modal.classList.add("d-flex");
+        modal.style.display = "flex";
+    }
+
+    function hideQR() {
+        const modal = document.getElementById("qrModal");
+        modal.style.display = "none";
+        modal.classList.remove("d-flex");
+    }
+    function goBack() {
+        window.history.back();
+    };
+
+    loadInvoice();
+</script>
+
+</body>
+</html>
