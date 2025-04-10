@@ -13,7 +13,6 @@ CORS(app)
 # Cấu hình JWT
 app.config["JWT_SECRET_KEY"] = Config.JWT_SECRET_KEY
 jwt = JWTManager(app)
-
 # Đăng ký route
 app.register_blueprint(auth_bp)
 app.register_blueprint(customers_bp)

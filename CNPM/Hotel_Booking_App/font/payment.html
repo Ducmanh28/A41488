@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Thanh toán</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -58,7 +59,6 @@
                 <div class="d-flex flex-wrap gap-3 mb-4">
                     <button class="btn btn-danger" onclick="goToPayment('vnpay')">Thanh toán bằng VNPAY</button>
                     <button class="btn btn-primary" onclick="goToPayment('card')">Thanh toán bằng CARD</button>
-                    <button class="btn btn-pink" style="background-color: #d81b60; color: white;" onclick="goToPayment('momo')">Thanh toán bằng MoMo</button>
                     <button class="btn btn-success" onclick="showQR()">Thanh toán bằng Tài khoản ngân hàng</button>
                 </div>
             </div>
@@ -67,13 +67,14 @@
 </div>
 
 <!-- QR Code Modal -->
+<!-- QR Code Modal -->
 <div id="qrModal"
      style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
      background-color:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
     <div class="bg-white p-4 rounded text-center position-relative" style="max-width: 400px;">
         <button onclick="hideQR()" style="position:absolute; top:10px; right:10px;" class="btn btn-sm btn-danger">X</button>
         <h5 class="mb-3">Quét mã để thanh toán</h5>
-        <img src="your-bank-qr.png" alt="QR thanh toán" width="250" class="border p-2 rounded">
+        <canvas id="bankQR" width="300" height="300"></canvas>
     </div>
 </div>
 
@@ -161,8 +162,31 @@
         const modal = document.getElementById("qrModal");
         modal.classList.add("d-flex");
         modal.style.display = "flex";
+    
+        // Lấy invoiceId từ URL (hoặc từ nơi khác nếu cần)
+        const invoiceId = new URLSearchParams(window.location.search).get('invoice_id');
+        
+        // Kiểm tra xem invoiceId có hợp lệ không
+        if (!invoiceId || isNaN(invoiceId)) {
+            console.error("Invoice ID không hợp lệ!");
+            alert("Lỗi: Mã hóa đơn không hợp lệ.");
+            return;
+        }
+    
+        // Tạo URL cho mã QR, trỏ tới banking.html và truyền kèm invoice_id
+        const qrContent = `http://127.0.0.1:5500/CNPM/Hotel_Booking_App/font/banking.html?invoice_id=${invoiceId}`;
+    
+        // Sử dụng thư viện QRCode để tạo mã QR từ URL
+        QRCode.toCanvas(document.getElementById("bankQR"), qrContent, function(error) {
+            if (error) {
+                console.error("Lỗi tạo QR Code:", error);
+                alert("Không thể tạo mã QR.");
+                return;
+            }
+            console.log("QR Code đã được tạo thành công!");
+        });
     }
-
+    
     function hideQR() {
         const modal = document.getElementById("qrModal");
         modal.style.display = "none";

@@ -9,8 +9,16 @@
     <h2>Thanh toán VNPAY</h2>
     <form id="vnpayForm">
         <div class="mb-3">
-            <label for="totalMoney" class="form-label">Số tiền thanh toán</label>
-            <input type="number" id="totalMoney" class="form-control" required>
+            <label for="idhoadon" class="form-label">Mã hóa đơn</label>
+            <input type="text" id="idhoadon" class="form-control" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="number" class="form-label">Số Tài Khoản</label>
+            <input type="text" id="number" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="totalMoney" class="form-label">Số tiền thanh toán (70%)</label>
+            <input type="text" id="totalMoney" class="form-control" readonly>
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Mô tả thanh toán</label>
@@ -21,21 +29,45 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const invoiceId = urlParams.get("invoice_id");
+        const invoices_id = urlParams.get("invoices_id");
+        const token = localStorage.getItem("access_token");
+        let payAmount = 0;
+            
+        async function fetchInvoiceTotal() {
+            try {
+                const res = await fetch(`http://127.0.0.1:5000/invoices/${invoices_id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
 
+                if (!res.ok) throw new Error("Lấy thông tin hóa đơn thất bại");
+
+                const data = await res.json();
+                const total = data.total_price || data.invoice?.total_price;
+                payAmount = (total * 0.7).toFixed(2);
+                document.getElementById("totalMoney").value = `${Number(payAmount).toLocaleString()} VND`;
+                document.getElementById("idhoadon").value = `${invoices_id}`
+                console.log(Number(payAmount).toLocaleString())
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        fetchInvoiceTotal();
         document.getElementById("vnpayForm").addEventListener("submit", async function(e) {
             e.preventDefault();
-            const token = localStorage.getItem("access_token");
-            const total_money = parseFloat(document.getElementById("totalMoney").value);
             const description = document.getElementById("description").value;
-
+            const card_number = document.getElementById("number").value;
             const res = await fetch(`http://127.0.0.1:5000/payment/vnpay/${invoiceId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({ total_money, description })
+                body: JSON.stringify({ total_money, description,card_number })
             });
 
             const result = await res.json();
