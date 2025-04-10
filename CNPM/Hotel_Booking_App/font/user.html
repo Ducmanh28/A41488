@@ -115,7 +115,7 @@
         <div class="container">
             <a class="navbar-brand" href="home1.html">HotelBooking</a>
             <div class="ms-auto">
-                <a href="home1.html" class="btn btn-outline-light me-2">Quay Lại</a>
+                <a href="home1.html" class="btn btn-outline-light me-2">Quay Lại Trang Chủ</a>
             </div>
         </div>
     </nav>
@@ -131,7 +131,7 @@
         <p><strong>Birth Date:</strong> <span id="birth_date">Loading...</span></p>
         <p><strong>Address:</strong> <span id="current_address">Loading...</span></p>
     </div>
-
+    <p></p>
     <!-- Nút chỉnh sửa thông tin -->
     <button id="editBtn">Chỉnh sửa</button>
 
@@ -154,7 +154,30 @@
             <button type="submit" id="submitBtn">Xác nhận</button>
         </form>
     </div>
-
+    <div class="container mt-5">
+        <div id="transaction-history">
+            <h4>Lịch sử giao dịch</h4>
+            <ul id="transaction-list" class="list-group">
+                <!-- Danh sách giao dịch sẽ được thêm vào đây -->
+            </ul>
+        </div>
+    </div>
+    <div class="modal fade" id="invoiceDetailModal" tabindex="-1" aria-labelledby="invoiceDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceDetailModalLabel">Chi tiết hóa đơn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="invoiceDetailContent"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // Lấy user_id từ localStorage
         const userId = localStorage.getItem('customer_id');
@@ -262,7 +285,82 @@
         function goBack() {
             window.history.back();
         }
+        fetch(`http://127.0.0.1:5000/customer/${userId}/invoices`, {  
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}` 
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const transactionList = document.getElementById("transaction-list");
+
+            if (Array.isArray(data) && data.length > 0) {
+                // Dữ liệu là mảng và có ít nhất một giao dịch
+                data.forEach(transaction => {
+                    // Tạo phần tử li cho mỗi giao dịch
+                    const listItem = document.createElement("li");
+                    listItem.classList.add("list-group-item");
+
+                    // Nội dung của từng giao dịch
+                    listItem.innerHTML = `
+                        <strong>ID Hóa đơn:</strong> ${transaction.id} <br>
+                        <strong>Ngày cập nhật gần nhất:</strong> ${new Date(transaction.updated_at).toLocaleDateString()} <br>
+                        <strong>Tổng giá trị:</strong> ${transaction.total_price} VND <br>
+                        <strong>Trạng thái:</strong> ${transaction.state} <br>
+                        <button class="btn btn-info" onclick="viewInvoiceDetails(${transaction.id})">Xem chi tiết</button>
+                    `;
+                    
+                    // Thêm phần tử vào danh sách
+                    transactionList.appendChild(listItem);
+                });
+            } else {
+                // Hiển thị thông báo nếu không có giao dịch
+                const noTransactionsMessage = document.createElement("li");
+                noTransactionsMessage.classList.add("list-group-item");
+                noTransactionsMessage.textContent = "Không có giao dịch nào.";
+                transactionList.appendChild(noTransactionsMessage);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching transaction data:', error);
+            alert('Có lỗi xảy ra khi tải dữ liệu giao dịch');
+        });
+
+        // Hàm để hiển thị chi tiết hóa đơn
+        function viewInvoiceDetails(invoiceId) {
+            fetch(`http://127.0.0.1:5000/invoices/${invoiceId}`, {  
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}` 
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const modalContent = document.getElementById("invoiceDetailContent");
+                modalContent.innerHTML = `
+                    <strong>Mã hóa đơn:</strong> ${data.id} <br>
+                    <strong>Ngày nhận phòng:</strong> ${new Date(data.check_in).toLocaleDateString()} <br>
+                    <strong>Ngày trả phòng:</strong> ${new Date(data.check_out).toLocaleDateString()} <br>
+                    <strong>Tổng giá trị:</strong> ${data.total_price} VND <br>
+                    <strong>Trạng thái:</strong> ${data.state} <br>
+                    <strong>Thời gian tạo:</strong> ${new Date(data.create_at).toLocaleString()} <br>
+                    <strong>Người đặt:</strong> ${data.customer_id} <br>
+                    <strong>Khách sạn:</strong> ${data.hotel_id} <br>
+                    <strong>Thời gian cập nhật:</strong> ${new Date(data.updated_at).toLocaleString()}
+                `;
+                
+                // Hiển thị modal
+                var myModal = new bootstrap.Modal(document.getElementById('invoiceDetailModal'));
+                myModal.show();
+            })
+            .catch(error => {
+                console.error('Error fetching invoice details:', error);
+                alert('Không thể lấy thông tin chi tiết hóa đơn');
+            });
+        }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

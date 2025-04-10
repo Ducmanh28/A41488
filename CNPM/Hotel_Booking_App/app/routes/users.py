@@ -103,13 +103,13 @@ def get_customer_info():
     else: 
         return jsonify({"error": "Không tìm thấy tên khách hàng"}), 404
     return jsonify(customer)
-@customers_bp.route("/customer/<int:user_id>/invoices",methods=["GET"])
+@customers_bp.route("/customer/<int:user_id>/invoices", methods=["GET"])
 @jwt_required()
 def get_invoices_of_user(user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM invoices WHERE customer_id = %s",(user_id, ))
-    history = cursor.fetchone()
+    cursor.execute("SELECT * FROM invoices WHERE customer_id = %s", (user_id,))
+    invoices = cursor.fetchall()
     cursor.close()
     conn.close()
-    return jsonify(history)
+    return jsonify(invoices)
