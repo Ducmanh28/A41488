@@ -46,10 +46,16 @@
             .then(response => response.json())
             .then(result => {
                 alert(result.message || result.error);
-                if (result.access_token) {
+                console.log(result.role)
+                if (result.role === "customers") {
                     localStorage.setItem("access_token", result.access_token);
                     localStorage.setItem('customer_id', result.customer_id);
                     window.location.href = "home1.html";
+                }
+                else if (result.role === "admin") {
+                    localStorage.setItem("access_token", result.access_token);
+                    localStorage.setItem('customer_id', result.customer_id);
+                    window.location.href = "admin.html";
                 }
             })
             .catch(error => console.error("Lỗi:", error));

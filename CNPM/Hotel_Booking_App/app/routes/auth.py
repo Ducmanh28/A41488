@@ -89,7 +89,7 @@ def login():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        query = f"SELECT username, password, id FROM customers WHERE {field} = %s"
+        query = f"SELECT username, password, id, role FROM customers WHERE {field} = %s"
         cursor.execute(query, (identifier,))
         user = cursor.fetchone()
         cursor.close()
@@ -97,7 +97,7 @@ def login():
 
         if user and user[1] == password:
             access_token = create_access_token(identity=user[0],expires_delta=timedelta(hours=1))
-            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2]}), 200
+            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2], "role": user[3]}), 200
         else:
             return jsonify({"error": "Sai username/email hoặc password"}), 401
 

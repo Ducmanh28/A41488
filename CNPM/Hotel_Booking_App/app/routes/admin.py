@@ -1,22 +1,43 @@
-from db import get_db_connection
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from app.utils import get_userid_from_token
-customers_bp = Blueprint("customers", __name__)
+from utils import get_db_connection
 
-@customers_bp.route("/customers/<int:user_id>",methods=["GET"])
+admin_bp = Blueprint("admin",__name__)
+
+@admin_bp.route("/admin/customers/total",methods=["GET"])
 @jwt_required()
-def get_users(user_id):
+def get_total_customers():
+    count = 0
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id from customers where role = 'customers' ")
+    customers = cursor.fetchall()
+    for customer in customers:
+        count += 1
+    return count
+@admin_bp.route("/admin/customers",methods=["GET"])
+@jwt_required()
+def get_all_customers():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM customers WHERE id = %s",(user_id, ))
-    users = cursor.fetchone()
+    cursor.execute("SELECT * FROM customers")
+    users = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(users)
-@customers_bp.route("/customers/<int:user_id>",methods=["PUT"])
+@admin_bp.route("/admin/customers/<int:customer_id>",methods=["DELETE"])
 @jwt_required()
-def updated_users(user_id):
+def remove_customers(customer_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("DELETE * FROM customers WHERE id = %s",(customer_id, ))
+    conn.commit
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Xóa user thành công!"})
+@admin_bp.route("/admin/customers/<int:customer_id>",methods=["PUT"])
+@jwt_required()
+def updated_customers(customer_id):
     data = request.json
     if not data:
         return jsonify({"error": "Dữ liệu cập nhật không hợp lệ"}), 400
@@ -53,7 +74,7 @@ def updated_users(user_id):
 
     # Ghép câu lệnh SQL
     query = f"UPDATE customers SET {', '.join(fields)} WHERE id = %s"
-    values.append(user_id)
+    values.append(customer_id)
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -64,41 +85,21 @@ def updated_users(user_id):
         return jsonify({"message": "User updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-@customers_bp.route("/customers/<int:user_id>",methods=["DELETE"])
+@admin_bp.route("/admin/customers/create_user",methods=["POST"])
 @jwt_required()
-def deleted_users(user_id):
+def create_customers():
+    data = request.json
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")  
+    phone = data.get("phone_number")
+    full_name = data.get("full_name") 
+    citizen_id = data.get("citizen_id")
+    role = data.get("role")
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM customers WHERE id = %s", (user_id, ))
+    cursor.execute("INSERT INTO customers(username,email,password,phone_number,full_name,citizen_id,role) VALUES(%s,%s,%s,%s,%s,%s,%s)",(username,email,password,phone,citizen_id,full_name,role))
     conn.commit()
     cursor.close()
     conn.close()
-    
-    return jsonify({"message": "User deleted successfully"}), 201
-@customers_bp.route('/get_customer_info', methods=['GET'])
-@jwt_required()  
-def get_customer_info():
-    customer_id = get_userid_from_token()
-    if customer_id:
-    # Truy vấn thông tin từ database
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM customers WHERE id = %s", (customer_id,))
-        customer = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        if not customer:
-            return jsonify({"error": "Khách hàng không tồn tại"}), 404
-    else: 
-        return jsonify({"error": "Không tìm thấy tên khách hàng"}), 404
-    return jsonify(customer)
-@customers_bp.route("/customer/<int:user_id>/invoices", methods=["GET"])
-@jwt_required()
-def get_invoices_of_user(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM invoices WHERE customer_id = %s", (user_id,))
-    invoices = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify(invoices)
+    return jsonify({"message": "Tạo thành công!"})
