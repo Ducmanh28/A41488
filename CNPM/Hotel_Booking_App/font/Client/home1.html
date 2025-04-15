@@ -23,7 +23,7 @@
             <a class="navbar-brand" href="home1.html">HotelBooking</a>
             <div class="ms-auto">
                 <a href="user.html" class="btn btn-outline-light me-2">Thông tin cá nhân</a>
-                <a href="home.html" class="btn btn-outline-light me-2">Đăng Xuất</a>
+                <a href="/CNPM/Hotel_Booking_App/font/home.html" class="btn btn-outline-light me-2">Đăng Xuất</a>
             </div>
         </div>
     </nav>
@@ -64,7 +64,7 @@
                     let hotelCard = document.createElement("div");
                     hotelCard.className = "col-md-4";
                     hotelCard.innerHTML = `
-                        <div class="card hotel-card" onclick="redirectToHotel()">
+                        <div class="card hotel-card" onclick="redirectToHotel(${hotel.id})">
                             <div class="card-body text-white" style="background-image: url('${hotel.image_url}'); background-size: cover; background-position: center; border-radius: 15px; padding: 20px;">
                                 <div style="background-color: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 10px;">
                                     <h5 class="card-title">${hotel.name}</h5>

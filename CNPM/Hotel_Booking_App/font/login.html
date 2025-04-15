@@ -50,12 +50,12 @@
                 if (result.role === "customers") {
                     localStorage.setItem("access_token", result.access_token);
                     localStorage.setItem('customer_id', result.customer_id);
-                    window.location.href = "home1.html";
+                    window.location.href = "/CNPM/Hotel_Booking_App/font/Client/home1.html";
                 }
                 else if (result.role === "admin") {
                     localStorage.setItem("access_token", result.access_token);
                     localStorage.setItem('customer_id', result.customer_id);
-                    window.location.href = "admin.html";
+                    window.location.href = "/CNPM/Hotel_Booking_App/font/Admin/admin.html";
                 }
             })
             .catch(error => console.error("Lỗi:", error));

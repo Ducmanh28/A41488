@@ -298,7 +298,7 @@ def delete_room(roomtype_id):
     cursor.close()
     conn.close()
     return jsonify({"message": "Đã xóa thành công"})
-@admin_bp.route("/admin/additionalservices",method=["POST"])
+@admin_bp.route("/admin/additionalservices",methods=["POST"])
 @jwt_required()
 def create_additionalservices():
     data = request.json
@@ -311,4 +311,28 @@ def create_additionalservices():
     cursor.close()
     conn.close()
     return jsonify({"message": "Thêm dịch vụ thành công"})
-
+@admin_bp.route("/admin/additionalservices/<int:service_id>",methods=["PUT"])
+@jwt_required()
+def update_additionalservices(service_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    data = request.json
+    service_name = data.get("service_name")
+    service_price = data.get("service_price")
+    cursor.execute("UPDATE additionalservices SET service_name = %s,price = %s WHERE id = %s",(service_name,service_price,service_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    message = f"Cập nhật thành công dịch vụ {service_id}"
+    return jsonify({"message": message})
+@admin_bp.route("/admin/additionalservices/<int:service_id>",methods=["DELETE"])
+@jwt_required()
+def delete_additionalservices(service_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM additionalservices WHERE id = %s",(service_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    message = f"Xóa thành công dịch vụ {service_id}"
+    return jsonify({"message": message})
