@@ -39,7 +39,7 @@
                 [isEmail ? 'email' : 'username']: usernameOrEmail,
                 password: password
             };
-            fetch(`http://127.0.0.1/login`, {
+            fetch(`http://127.0.0.1:5000/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
@@ -54,7 +54,7 @@
                 else if (result.role === "admin") {
                     localStorage.setItem("access_token", result.access_token);
                     localStorage.setItem('customer_id', result.customer_id);
-                    window.location.href = "Admin/admin.html";
+                    window.location.href = "CNPM/Hotel_Booking_App/font/Admin/admin.html";
                 }
             })
             .catch(error => console.error("Lỗi:", error));

@@ -196,7 +196,7 @@
         let selectedServices = [];
 
         // Yêu cầu GET để lấy thông tin người dùng từ backend
-        fetch(`http://127.0.0.1/customers/${userId}`, {
+        fetch(`http://127.0.0.1:5000/customers/${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -256,7 +256,7 @@
             const newAddress = document.getElementById('new_address').value || localStorage.getItem('current_address');
         
             try {
-                const res = await fetch(`http://127.0.0.1/customers/${userId}`, {
+                const res = await fetch(`http://127.0.0.1:5000/customers/${userId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -276,7 +276,7 @@
         
                 if (data.message) {
                     alert(data.message);
-                    await fetch(`http://127.0.0.1/admin/logs`, {
+                    await fetch(`http://127.0.0.1:5000/admin/logs`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -308,7 +308,7 @@
         function goBack() {
             window.history.back();
         }
-        fetch(`http://127.0.0.1/customer/${userId}/invoices`, {  
+        fetch(`http://127.0.0.1:5000/customer/${userId}/invoices`, {  
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}` 
@@ -358,7 +358,7 @@
         // Hàm để hiển thị chi tiết hóa đơn
         function viewInvoiceDetails(invoiceId) {
             localStorage.setItem("invoiceid", invoiceId);
-            fetch(`http://127.0.0.1/invoices/${invoiceId}`, {  
+            fetch(`http://127.0.0.1:5000/invoices/${invoiceId}`, {  
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}` 
@@ -368,25 +368,25 @@
             .then(data => {
                 localStorage.setItem("room_id", data.room_type_id);
                 return Promise.all([
-                    fetch(`http://127.0.0.1/customers/${data.customer_id}`, {
+                    fetch(`http://127.0.0.1:5000/customers/${data.customer_id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`
                         }
                     }),
-                    fetch(`http://127.0.0.1/hotels/${data.hotel_id}`, {
+                    fetch(`http://127.0.0.1:5000/hotels/${data.hotel_id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`
                         }
                     }),
-                    fetch(`http://127.0.0.1/invoices/${invoiceId}/additionalservices`, {
+                    fetch(`http://127.0.0.1:5000/invoices/${invoiceId}/additionalservices`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`
                         }
                     }),
-                    fetch(`http://127.0.0.1/roomtypes/${data.room_type_id}`, {
+                    fetch(`http://127.0.0.1:5000/roomtypes/${data.room_type_id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`
@@ -403,7 +403,7 @@
                     const roomname = roomData.name;
                     const roomprice = roomData.price;
                     const hotelName = hotelData.name;
-                    fetch(`http://127.0.0.1/customer/discounts/${customer_type_Id}`, {
+                    fetch(`http://127.0.0.1:5000/customer/discounts/${customer_type_Id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${accessToken}`
@@ -456,7 +456,7 @@
                         <strong>Thời gian cập nhật:</strong> ${new Date(data.updated_at).toLocaleString()}
                     `;
                     if (data.state === "DA THANH TOAN") {
-                        fetch(`http://127.0.0.1/payment/${data.id}`, {
+                        fetch(`http://127.0.0.1:5000/payment/${data.id}`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${accessToken}`
@@ -504,7 +504,7 @@
                 const createDate = localStorage.getItem("createDate");
                 const updateDate = localStorage.getItem("updateDate");
                 
-                fetch("http://127.0.0.1/additionalservices", {
+                fetch("http://127.0.0.1:5000/additionalservices", {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${accessToken}`
@@ -558,7 +558,7 @@
                     updateTotalPricePreview();
                     // Kiểm tra xem đã thanh toán chưa
                     if (status === "DA THANH TOAN") {
-                        fetch(`http://127.0.0.1/payment/${id}`, {
+                        fetch(`http://127.0.0.1:5000/payment/${id}`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${accessToken}`
@@ -612,7 +612,7 @@
                         };
                     
                         // Gửi PUT request
-                        fetch(`http://127.0.0.1/invoices/${id}`, {
+                        fetch(`http://127.0.0.1:5000/invoices/${id}`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -679,7 +679,7 @@
             }
         }
         function deletedInvoiceDetails(invoiceId) {
-            fetch(`http://127.0.0.1/invoices/${invoiceId}`, {
+            fetch(`http://127.0.0.1:5000/invoices/${invoiceId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
@@ -696,7 +696,7 @@
                 if (hoursDifference >= 24) {
                     // Nếu còn hơn 24 tiếng thì cho phép hủy
                     if (confirm("Bạn có chắc chắn muốn hủy hóa đơn này không?")) {
-                        fetch(`http://127.0.0.1/invoices/${invoiceId}`, {
+                        fetch(`http://127.0.0.1:5000/invoices/${invoiceId}`, {
                             method: 'DELETE',
                             headers: {
                                 'Authorization': `Bearer ${accessToken}`
@@ -732,7 +732,7 @@
             const token = localStorage.getItem("access_token");
         
             try {
-              const response = await fetch("http://127.0.0.1/logout", {
+              const response = await fetch("http://127.0.0.1:5000/logout", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",

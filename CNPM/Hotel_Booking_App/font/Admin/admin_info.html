@@ -179,7 +179,7 @@
 
     async function loadAdminInfo() {
         try {
-        const res = await fetch(`http://127.0.0.1/customers/${adminID}`, {
+        const res = await fetch(`http://127.0.0.1:5000/customers/${adminID}`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
@@ -230,7 +230,7 @@
         if (value.trim() !== "") data[key] = value;
         }
         try {
-        const res = await fetch(`http://127.0.0.1/admin/customers/${adminID}`, {
+        const res = await fetch(`http://127.0.0.1:5000/admin/customers/${adminID}`, {
             method: "PUT",
             headers: {
             "Content-Type": "application/json",
@@ -240,7 +240,7 @@
         });
         const result = await res.json();
         alert(result.message || "Cập nhật thành công!");
-        const logres = await fetch(`http://127.0.0.1/admin/logs`,{
+        const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

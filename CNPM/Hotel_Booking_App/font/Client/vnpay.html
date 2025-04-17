@@ -42,7 +42,7 @@
             
         async function fetchInvoiceTotal() {
             try {
-                const res = await fetch(`http://127.0.0.1/invoices/${invoices_id}`, {
+                const res = await fetch(`http://127.0.0.1:5000/invoices/${invoices_id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -69,7 +69,7 @@
             const description = document.getElementById("description").value;
             const card_number = document.getElementById("number").value;
             const total= localStorage.getItem("totalmn")
-            const res = await fetch(`http://127.0.0.1/payment/vnpay/${invoiceId}`, {
+            const res = await fetch(`http://127.0.0.1:5000/payment/vnpay/${invoiceId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -100,11 +100,11 @@
     }
     async function loadInvoice() {
         try {
-            const res = await authFetch(`http://127.0.0.1/invoices/${invoiceId}`);
+            const res = await authFetch(`http://127.0.0.1:5000/invoices/${invoiceId}`);
             const invoice = await res;
             document.getElementById('check_in_Date').textContent = formatDateToDDMMYYYY(invoice.check_in);
             document.getElementById('check_out_Date').textContent = formatDateToDDMMYYYY(invoice.check_out);
-            const customerres = await authFetch(`http://127.0.0.1/customers/${invoice.customer_id}`)
+            const customerres = await authFetch(`http://127.0.0.1:5000/customers/${invoice.customer_id}`)
             const customer = await customerres;
             const total = invoice.total_price
             document.getElementById('customerName').textContent = customer.full_name;
@@ -120,17 +120,17 @@
                 document.getElementById('someoneElseInfo').style.display = "block";
             }
 
-            const hotelRes = await authFetch(`http://127.0.0.1/hotels/${invoice.hotel_id}`);
+            const hotelRes = await authFetch(`http://127.0.0.1:5000/hotels/${invoice.hotel_id}`);
             const hotel = await hotelRes;
             document.getElementById('hotelName').textContent = hotel.name;
             document.getElementById('hotelAddress').textContent = hotel.address;
 
-            const roomRes = await authFetch(`http://127.0.0.1/roomtypes/${invoice.room_type_id}`);
+            const roomRes = await authFetch(`http://127.0.0.1:5000/roomtypes/${invoice.room_type_id}`);
             const room = await roomRes;
             document.getElementById('roomTypeName').textContent = room.name;
             document.getElementById('roomPrice').textContent = Number(room.price).toLocaleString('vi-VN');
 
-            const serviceRes = await authFetch(`http://127.0.0.1/invoices/${invoiceId}/additionalservices`);
+            const serviceRes = await authFetch(`http://127.0.0.1:5000/invoices/${invoiceId}/additionalservices`);
             const services = await serviceRes;
 
             const list = document.getElementById("additionalServicesList");
@@ -213,7 +213,7 @@
         const token = localStorage.getItem("access_token");
     
         try {
-          const response = await fetch("http://127.0.0.1/logout", {
+          const response = await fetch("http://127.0.0.1:5000/logout", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

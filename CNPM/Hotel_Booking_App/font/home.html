@@ -108,7 +108,7 @@
     <script>
         async function fetchHotels(queryParams = "") {
             try {
-                let response = await fetch(`http://127.0.0.1/hotels${queryParams}`);
+                let response = await fetch(`http://127.0.0.1:5000/hotels${queryParams}`);
                 let hotels = await response.json();
 
                 let hotelList = document.getElementById("hotel-list");

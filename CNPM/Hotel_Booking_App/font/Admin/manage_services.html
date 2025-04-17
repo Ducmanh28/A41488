@@ -172,7 +172,7 @@
       async function loadServices() {
         tbody.innerHTML = "";
         try {
-          const response = await fetch(`http://127.0.0.1/additionalservices`, {
+          const response = await fetch(`http://127.0.0.1:5000/additionalservices`, {
             headers: { 
               "Content-Type": "application/json",
               "Authorization": `Bearer ${token}` }
@@ -198,7 +198,7 @@
             btn.addEventListener("click", async (e) => {
               const id = e.target.dataset.id;
               console.log(id)
-              const res = await fetch(`http://127.0.0.1/admin/additionalservices/${id}`, {
+              const res = await fetch(`http://127.0.0.1:5000/admin/additionalservices/${id}`, {
                 headers: { 
                   "Content-Type": "application/json",
                   "Authorization": `Bearer ${token}` }
@@ -218,7 +218,7 @@
               const action = "Delete Service"
               if (confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) {
                 try {
-                  const res = await fetch(`http://127.0.0.1/admin/additionalservices/${id}`, {
+                  const res = await fetch(`http://127.0.0.1:5000/admin/additionalservices/${id}`, {
                     method: "DELETE",
                     headers: { 
                       "Content-Type": "application/json",
@@ -226,7 +226,7 @@
                   });
                   const result = await res.json();
                   alert(result.message || "Xóa thành công!");
-                  const logres = await fetch(`http://127.0.0.1/admin/logs`,{
+                  const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
                     method: "POST",
                     headers:{ 
                       "Content-Type": "application/json",
@@ -270,7 +270,7 @@
   
         try {
           const action = "Create Service"
-          const res = await fetch("http://127.0.0.1/admin/additionalservices/create", {
+          const res = await fetch("http://127.0.0.1:5000/admin/additionalservices/create", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -280,7 +280,7 @@
           });
           const result = await res.json();
           alert(result.message || "Tạo thành công!");
-          const logres = await fetch(`http://127.0.0.1/admin/logs`,{
+          const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
             method: "POST",
             headers:{ 
               "Content-Type": "application/json",
@@ -310,7 +310,7 @@
         };
   
         try {
-          const res = await fetch(`http://127.0.0.1/admin/additionalservices/${serviceId}`, {
+          const res = await fetch(`http://127.0.0.1:5000/admin/additionalservices/${serviceId}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -321,7 +321,7 @@
           const result = await res.json();
           alert(result.message || "Cập nhật thành công!");
           const action = "Update Service"
-          const logres = await fetch(`http://127.0.0.1/admin/logs`,{
+          const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
             method: "POST",
             headers:{ 
               "Content-Type": "application/json",
@@ -350,7 +350,7 @@
       const token = localStorage.getItem("access_token");
   
       try {
-        const response = await fetch("http://127.0.0.1/logout", {
+        const response = await fetch("http://127.0.0.1:5000/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -383,7 +383,7 @@
       const tbody = document.getElementById("services-table-body");
       const accesstoken = localStorage.getItem("access_token");
       try {
-          let response = await fetch("http://127.0.0.1/admin/additionalservices/find", {
+          let response = await fetch("http://127.0.0.1:5000/admin/additionalservices/find", {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
@@ -429,7 +429,7 @@
               const action = "Delete Service"
               if (confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) {
                 try {
-                  const res = await fetch(`http://127.0.0.1/admin/additionalservices/${id}`, {
+                  const res = await fetch(`http://127.0.0.1:5000/admin/additionalservices/${id}`, {
                     method: "DELETE",
                     headers: { 
                       "Content-Type": "application/json",
@@ -437,7 +437,7 @@
                   });
                   const result = await res.json();
                   alert(result.message || "Xóa thành công!");
-                  const logres = await fetch(`http://127.0.0.1/admin/logs`,{
+                  const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
                     method: "POST",
                     headers:{ 
                       "Content-Type": "application/json",
@@ -462,7 +462,7 @@
             btn.addEventListener("click", async (e) => {
               const id = e.target.dataset.id;
               console.log(id)
-              const res = await fetch(`http://127.0.0.1/additionalservices/${id}`, {
+              const res = await fetch(`http://127.0.0.1:5000/additionalservices/${id}`, {
                 headers: { 
                   "Content-Type": "application/json",
                   "Authorization": `Bearer ${accesstoken}` }
