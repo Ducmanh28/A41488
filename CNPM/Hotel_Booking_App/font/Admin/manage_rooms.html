@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quản lý người dùng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .navbar {
+      background-color: #000 !important;
+    }
+    .navbar-brand, .navbar-nav .nav-link {
+      color: white !important;
+      font-weight: bold;
+    }
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      background-color: #fff;
+      border-right: 1px solid #dee2e6;
+    }
+    .sidebar .nav-link {
+      color: #000;
+      font-weight: 500;
+    }
+    .sidebar .nav-link.active {
+      background-color: #d1e7dd;
+      font-weight: bold;
+    }
+    .sidebar .profile {
+      text-align: center;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .sidebar .profile img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid #198754;
+    }
+    .topbar-buttons .btn {
+      font-weight: 500;
+    }
+    .content-wrapper {
+      flex: 1;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="../home.html">Hotel Booking</a>
+      <div class="ms-auto topbar-buttons">
+        <button class="btn btn-light me-2" disabled id="today-date"></button>
+        <button id="logoutBtn" class="btn btn-outline-light">Đăng Xuất</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="d-flex">
+    <div class="sidebar d-flex flex-column">
+      <div class="profile">
+        <img src="admin.jpg" alt="Admin Avatar" />
+        <p class="mt-2 mb-0 fw-bold text-success" id="admin-name"></p>
+      </div>
+      <nav class="nav flex-column p-2">
+        <a class="nav-link" href="admin.html">Dashboard</a>
+        <a class="nav-link" href="manage_users.html">Quản lý người dùng</a>
+        <a class="nav-link" href="manage_hotels.html">Quản lý khách sạn</a>
+        <a class="nav-link active" href="manage_rooms.html">Quản lý phòng</a>
+        <a class="nav-link" href="manage_services.html">Quản lý dịch vụ thêm</a>
+        <a class="nav-link" href="manage_invoices.html">Quản lý hóa đơn</a>
+        <a class="nav-link" href="manage_schedule.html">Quản lý lịch</a>
+        <a class="nav-link" href="manage_log.html">Quản lý Log</a>
+      </nav>
+    </div>
+    <div class="content-wrapper p-4">
+        <div class="mb-4">
+          <h3 class="fw-bold mb-3">Danh sách Phòng</h3>
+      
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <div class="mb-2">
+                    <label class="form-label">Tìm kiếm theo</label>
+                    <select class="form-select" id="searchType" name="type" required>
+                      <option value="id">Mã Phòng</option>
+                      <option value="hotel_id">Mã khách sạn</option>
+                      <option value="name">Tên Phòng</option>
+                      <option value="availability">Số lượng trống(lớn hơn)</option>
+                    </select>
+                </div>
+              <input type="text" id="SearchTypeValue" class="form-control" placeholder="Nhập thông tin tìm kiếm">
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-primary w-100" onclick="searchRooms()">Tìm kiếm</button>
+            </div>
+            <div class="col-md-3 ms-auto text-end">
+              <button class="btn btn-success w-100" id="addRoomBtn">+ Thêm phòng</button>
+            </div>
+          </div>
+        </div>
+      
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark text-center">
+              <tr>
+                <th scope="col">Mã Phòng</th>
+                <th scope="col">Mã Khách sạn</th>
+                <th scope="col">Tên Phòng</th>
+                <th scope="col">Dịch vụ</th>
+                <th scope="col">Còn trống</th>
+                <th scope="col">Giá</th>
+                <th scope="col">Cập nhật</th>
+                <th scope="col">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="room-table-body" class="text-center">
+              <!-- Dữ liệu render động -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+  <div id="createRoomModal" class="modal fade" tabindex="-1" aria-labelledby="createRoomModalLabel" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="createRoomForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createRoomModalLabel">Thêm Phòng mới</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-2"><label class="form-label">Tên</label><input type="text" name="name" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Diện tích</label><input type="text" name="area" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Dịch vụ</label><input type="text" name="services" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Số người ở</label><input type="text" name="capacity" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">IMG URL</label><input type="text" name="image_url" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Loại giường</label><input type="text" name="bed_type" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Đánh giá</label><input type="text" name="rating" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Còn trống</label><input type="text" name="availability" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Giá</label><input type="text" name="price" class="form-control" required></div>
+            <div class="mb-2">
+                <label class="form-label">Khách sạn</label> 
+                <select class="form-select" id="hotelSelect" name="hotel_id" required>
+                  <option value="">-- Chọn khách sạn --</option>
+                </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Tạo</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="editRoomModal" class="modal fade" tabindex="-1" aria-labelledby="editRoomModalLabel" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editRoomForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editRoomModalLabel">Chỉnh sửa Phòng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="edit-room-id">
+            <div class="mb-2"><label class="form-label">Tên Phòng</label><input type="text" id="edit-roomname" class="form-control" required></div>
+            <div class="mb-2"><label class="form-label">Loại giường</label><input type="text" id="edit-bed-type" class="form-control" ></div>
+            <div class="mb-2"><label class="form-label">Số người ở</label><input type="text" id="edit-capacity" class="form-control"></div>
+            <div class="mb-2"><label class="form-label">Dịch vụ</label><input type="text" id="edit-services" class="form-control"></div>
+            <div class="mb-2"><label class="form-label">Còn trống</label><input type="text" id="edit-availability" class="form-control"></div>
+            <div class="mb-2"><label class="form-label">Giá</label><input type="text" id="edit-price" class="form-control"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      const tbody = document.getElementById("room-table-body");
+      const token = localStorage.getItem("access_token");
+      const adminID = localStorage.getItem("customer_id")
+      document.getElementById("admin-name").innerText = localStorage.getItem("ADMINNAME");
+      fetch("https://api.ducmanhsuncloud.click/hotels",{
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+      })
+        .then(response => {
+            if (!response.ok) throw new Error("Lỗi khi gọi API khách sạn");
+            return response.json();
+        })
+        .then(data => {
+            const select = document.getElementById("hotelSelect");
+            data.forEach(hotel => {
+                const option = document.createElement("option");
+                option.value = hotel.id;
+                option.textContent = hotel.name;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("Không thể tải danh sách khách sạn:", error);
+        })
+      async function loadRooms() {
+        tbody.innerHTML = "";
+        try {
+          const response = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes`, {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` }
+          });
+          const data = await response.json();
+          data.forEach(room => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${room.id}</td>
+              <td>${room.hotel_id}</td>
+              <td>${room.name}</td>
+              <td>${room.services}</td>
+              <td>${room.availability}</td>
+              <td>${room.price}</td>
+              <td>${new Date(room.create_at).toLocaleString()}</td>
+              <td>
+                <button class="btn btn-sm btn-primary btn-edit" data-id="${room.id}">Sửa</button>
+                <button class="btn btn-sm btn-danger btn-delete" data-id="${room.id}">Xóa</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+          
+          document.querySelectorAll(".btn-edit").forEach(btn =>
+            btn.addEventListener("click", async (e) => {
+              const id = e.target.dataset.id;
+              console.log(id)
+              const res = await fetch(`https://api.ducmanhsuncloud.click/roomtypes/${id}`, {
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` }
+              });
+              const room = await res.json();
+              document.getElementById("edit-room-id").value = room.id;
+              document.getElementById("edit-roomname").value = room.name;
+              document.getElementById("edit-bed-type").value = room.bed_type;
+              document.getElementById("edit-availability").value = room.availability || "";
+              document.getElementById("edit-capacity").value = room.capacity;
+              document.getElementById("edit-services").value = room.services;
+              document.getElementById("edit-price").value = room.price;
+              const modal = new bootstrap.Modal(document.getElementById("editRoomModal"));
+              modal.show();
+            })
+          );
+  
+          document.querySelectorAll(".btn-delete").forEach(btn =>
+            btn.addEventListener("click", async (e) => {
+              const id = e.target.dataset.id;
+              const action = "Delete Room"
+              if (confirm("Bạn có chắc chắn muốn xóa phòng này?")) {
+                try {
+                  const res = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/${id}`, {
+                    method: "DELETE",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` }
+                  });
+                  const result = await res.json();
+                  alert(result.message || "Xóa thành công!");
+                  const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+                    method: "POST",
+                    headers:{ 
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(
+                      {
+                        customer_id: adminID,
+                        action: action
+                      }
+                    )
+                  })
+                  const logerer = await logres.json();
+                  loadRooms();
+                } catch (err) {
+                  alert("Lỗi xóa phòng: " + err.message);
+                }
+              }
+            })
+          );
+  
+        } catch (error) {
+          console.error("Lỗi khi tải danh sách phòng:", error);
+          tbody.innerHTML = `<tr><td colspan="9" class="text-danger text-center">Không thể tải dữ liệu</td></tr>`;
+        }
+      }
+  
+      loadRooms();
+  
+      // Thêm mới
+      document.getElementById("addRoomBtn").addEventListener("click", () => {
+        const modal = new bootstrap.Modal(document.getElementById("createRoomModal"));
+        modal.show();
+      });
+  
+      document.getElementById("createRoomForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = {};
+        for (const [key, value] of formData.entries()) data[key] = value;
+  
+        try {
+          const action = "Create Room"
+          const res = await fetch("https://api.ducmanhsuncloud.click/admin/roomtypes/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          alert(result.message || "Tạo thành công!");
+          const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+            method: "POST",
+            headers:{ 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}` 
+            },
+            body: JSON.stringify(
+              {
+                customer_id: adminID,
+                action: action
+              }
+            )
+          })
+          const logerer = await logres.json();
+          location.reload();
+        } catch (err) {
+          alert("Lỗi: " + err.message);
+        }
+      });
+  
+      document.getElementById("editRoomForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const roomId = document.getElementById("edit-room-id").value;
+        const data = {
+          name: document.getElementById("edit-roomname").value,
+          bed_type: document.getElementById("edit-bed-type").value,
+          availability: document.getElementById("edit-availability").value,
+          services: document.getElementById("edit-services").value,
+          capacity: document.getElementById("edit-capacity").value,
+          price: document.getElementById("edit-price").value
+        };
+  
+        try {
+          const res = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/${roomId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          alert(result.message || "Cập nhật thành công!");
+          const action = "Update Room"
+          const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+            method: "POST",
+            headers:{ 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}` 
+            },
+            body: JSON.stringify(
+              {
+                customer_id: adminID,
+                action: action
+              }
+            )
+          })
+          const logerer = await logres.json();
+          location.reload();
+        } catch (err) {
+          alert("Lỗi khi cập nhật: " + err.message);
+        }
+      });
+  
+      // Hiển thị ngày hôm nay
+      const todayDate = document.getElementById("today-date");
+      const today = new Date();
+      todayDate.textContent = today.toLocaleDateString("vi-VN");
+    });
+    document.getElementById("logoutBtn").addEventListener("click", async function () {
+      const token = localStorage.getItem("access_token");
+  
+      try {
+        const response = await fetch("https://api.ducmanhsuncloud.click/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ action: "Logout" })
+        });
+  
+        if (!response.ok) throw new Error("Logout thất bại!");
+  
+        localStorage.removeItem("access_token");
+        window.location.href = "../home.html";
+      } catch (err) {
+        console.error("Lỗi khi logout:", err);
+        alert("Đăng xuất thất bại. Vui lòng thử lại.");
+      }
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+      const adminName = document.getElementById("admin-name");
+      adminName.style.cursor = "pointer"; 
+      adminName.title = "Xem thông tin admin";
+  
+      adminName.addEventListener("click", function () {
+        window.location.href = "admin_info.html";
+      });
+    });
+    async function searchRooms() {
+        const type = document.getElementById("searchType").value;
+        const type_value = document.getElementById("SearchTypeValue").value;
+        const tbody = document.getElementById("room-table-body");
+        const accesstoken = localStorage.getItem("access_token");
+        try {
+            let response = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/find`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accesstoken}`
+                },body:JSON.stringify({
+                    type: type,
+                    type_data: type_value
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`Lỗi từ server: ${response.status} - ${response.statusText}`);
+            }
+            let rooms = await response.json();
+            tbody.innerHTML = "";
+            rooms.forEach(room => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${room.id}</td>
+                    <td>${room.hotel_id}</td>
+                    <td>${room.name}</td>
+                    <td>${room.services}</td>
+                    <td>${room.availability}</td>
+                    <td>${room.price.toLocaleString()} VND</td>
+                    <td>${new Date(room.update_at || room.create_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary btn-edit" data-id="${room.id}">Sửa</button>
+                        <button class="btn btn-sm btn-danger btn-delete" data-id="${room.id}">Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            if (rooms.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">Không có phòng nào thuộc khách sạn này.</td>
+                    </tr>
+                `;
+            }
+        } catch (error) {
+            console.error("Lỗi khi tìm phòng:", error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center text-danger">Không thể tải danh sách phòng.</td>
+                </tr>
+            `;
+        }
+        document.querySelectorAll(".btn-delete").forEach(btn =>
+            btn.addEventListener("click", async (e) => {
+              const id = e.target.dataset.id;
+              const action = "Delete Room"
+              if (confirm("Bạn có chắc chắn muốn xóa phòng này?")) {
+                try {
+                  const res = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/${id}`, {
+                    method: "DELETE",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` }
+                  });
+                  const result = await res.json();
+                  alert(result.message || "Xóa thành công!");
+                  const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+                    method: "POST",
+                    headers:{ 
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${accesstoken}` 
+                    },
+                    body: JSON.stringify(
+                      {
+                        customer_id: adminID,
+                        action: action
+                      }
+                    )
+                  })
+                  const logerer = await logres.json();
+                  loadRooms();
+                } catch (err) {
+                  alert("Lỗi xóa phòng: " + err.message);
+                }
+              }
+            })
+          );
+          document.querySelectorAll(".btn-edit").forEach(btn =>
+            btn.addEventListener("click", async (e) => {
+              const id = e.target.dataset.id;
+              console.log(id)
+              const res = await fetch(`https://api.ducmanhsuncloud.click/roomtypes/${id}`, {
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accesstoken}` }
+              });
+              const room = await res.json();
+              document.getElementById("edit-room-id").value = room.id;
+              document.getElementById("edit-roomname").value = room.name;
+              document.getElementById("edit-bed-type").value = room.bed_type;
+              document.getElementById("edit-availability").value = room.availability || "";
+              document.getElementById("edit-capacity").value = room.capacity;
+              document.getElementById("edit-services").value = room.services;
+              document.getElementById("edit-price").value = room.price;
+              const modal = new bootstrap.Modal(document.getElementById("editRoomModal"));
+              modal.show();
+            })
+          );
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

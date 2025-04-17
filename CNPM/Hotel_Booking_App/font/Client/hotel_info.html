@@ -11,6 +11,7 @@
         .room-img { width: 100%; height: 200px; object-fit: cover; }
         .room-info { padding: 15px; }
     </style>
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -24,14 +25,16 @@
         <h2 class="text-center" id="hotel-name">Đang tải...</h2>
 
         <div class="card">
-            <div class="card-body" id="hotel-details">
+            <div class="card-body" id="hotel-details" 
+            style="background-size: cover; background-position: center; border-radius: 15px; padding: 20px; color: white; text-shadow: 1px 1px 4px black;">
                 <p><strong>📍 Địa chỉ:</strong> <span id="hotel-address"></span></p>
                 <p><strong>📞 Hotline:</strong> <span id="hotel-hotline"></span></p>
                 <p><strong>📌 Khu vực:</strong> <span id="hotel-area"></span></p>
-                <p><strong>💰 Giá:</strong> <span id="hotel-rate"></span> VNĐ</p>
+                <p><strong>⭐ Số sao:</strong> <span id="hotel-rate"></span> sao</p>
+                <p><strong>💰 Giá:</strong> Từ <span id="hotel-price"></span>triệu</p>
                 <p><strong>🏨 Trạng thái:</strong> <span id="hotel-status"></span></p>
                 <p><strong>📝 Mô tả:</strong> <span id="hotel-description"></span></p>
-                <p><strong>⭐ Đánh giá:</strong> <span id="hotel-review"></span></p>
+                <p><strong>✔ Đánh giá:</strong> <span id="hotel-review"></span></p>
                 <a href="#room-list" class="btn btn-primary">Xem phòng</a>
             </div>
         </div>
@@ -79,7 +82,7 @@
                 return;
             }
         
-            const apiUrl = `http://127.0.0.1:5000/hotels/${hotelId}`;
+            const apiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}`;
         
             try {
                 let response = await fetch(apiUrl);
@@ -89,7 +92,10 @@
                 document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
                 document.getElementById("hotel-hotline").textContent = hotel.hotline || "Không có thông tin";
                 document.getElementById("hotel-area").textContent = hotel.area || "Không xác định";
-                document.getElementById("hotel-rate").textContent = hotel.rate ? hotel.rate + " triệu" : "Chưa có";
+                document.getElementById("hotel-details").style.backgroundImage = `url('${hotel.image_url}')`;
+                console.log(hotel.image_url)
+                document.getElementById("hotel-rate").textContent = hotel.rate || "Chưa có";
+                document.getElementById("hotel-price").textContent = hotel.hotel_price || "Không rõ";
                 document.getElementById("hotel-status").textContent = hotel.status || "Không rõ";
                 document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
                 document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
@@ -100,7 +106,7 @@
         }
 
         async function fetchRoomTypes(hotelId) {
-            const roomApiUrl = `http://127.0.0.1:5000/hotels/${hotelId}/roomtypes`;
+            const roomApiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}/roomtypes`;
 
             try {
                 let response = await fetch(roomApiUrl);
@@ -122,7 +128,7 @@
 
                 roomCard.innerHTML = `
                     <div class="card room-card shadow-sm">
-                        <img src="${room.image || '/font/default-room.jpg'}" class="room-img" alt="${room.name}">
+                        <img src="${room.img_url || 'default-room.jpg'}" class="room-img" alt="${room.name}">
                         <div class="room-info">
                             <h5>${room.name}</h5>
                             <p><strong>Giá:</strong> ${room.price} VNĐ</p>
@@ -138,14 +144,14 @@
         }
 
         async function viewRoomDetails(roomId) {
-            const apiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
+            const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
 
             try {
                 let response = await fetch(apiUrl);
                 let room = await response.json();
 
                 document.getElementById("room-title").textContent = room.name;
-                document.getElementById("room-img").src = room.image || "default-room.jpg";
+                document.getElementById("room-img").src = room.img_url || "default-room.jpg";
                 document.getElementById("room-size").textContent = room.area;
                 document.getElementById("room-capacity").textContent = room.capacity;
                 document.getElementById("room-bed").textContent = room.bed_type;
@@ -161,7 +167,7 @@
 
         async function selectRoom(roomId) {
             try {
-                const apiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
+                const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
                 let response = await fetch(apiUrl);
                 if (!response.ok) throw new Error("Không thể lấy dữ liệu phòng.");
         

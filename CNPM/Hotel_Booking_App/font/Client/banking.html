@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Thanh toán Ngân hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -11,6 +12,7 @@
             <a class="navbar-brand" href="home.html">HotelBooking</a>
         </div>
     </nav>
+    <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
 
     <div class="container my-5">
         <div class="card shadow-lg">
@@ -66,14 +68,12 @@
 
         async function loadInvoice() {
             try {
-                const res = await authFetch(`http://127.0.0.1:5000/invoices/${invoices_id}`);
+                const res = await authFetch(`https://api.ducmanhsuncloud.click/invoices/${invoices_id}`);
                 const invoice = await res;
                 const total = invoice.total_price;
                 console.log(total)
                 const id = Number(invoice.id);
-                payAmount = (total * 0.7).toFixed(2);
-                console.log(payAmount)
-                document.getElementById("totalAmount").value = `${Number(payAmount).toLocaleString()} VND`;
+                document.getElementById("totalAmount").value = `${Number(total).toLocaleString()} VND`;
                 document.getElementById('idhoadon').textContent = id.toLocaleString('vi-VN');
             } catch (err) {
                 console.error("Lỗi khi tải thông tin hóa đơn:", err);
@@ -86,9 +86,8 @@
             const card_number = document.getElementById("cardNumber").value;
             const description = document.getElementById("description").value;
             const total_money = document.getElementById("totalAmount").value;
-            console.log(card_type,card_number,description,total_money)
             try{
-                const conres = await fetch(`http://127.0.0.1:5000/payment/banking`,{
+                const conres = await fetch(`https://api.ducmanhsuncloud.click/payment/banking`,{
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -98,7 +97,7 @@
                         invoices_id,
                         card_type,
                         card_number,
-                        total_money: parseFloat(payAmount),
+                        total_money: parseFloat(total_money),
                         description
                     })
                 })
@@ -106,6 +105,8 @@
 
                 if (conres.ok) {
                     alert(result.message);
+                    alert("Quay trở về trang chủ")
+                    window.location.href = "home1.html"
                 } else {
                     alert(`Lỗi: ${result.message}`);
                 }
@@ -115,6 +116,9 @@
             }
         }
         loadInvoice();
+        function goBack() {
+            window.history.back();
+        }
     </script>
 
 </body>

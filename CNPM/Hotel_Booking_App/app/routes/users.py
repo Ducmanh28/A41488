@@ -1,9 +1,20 @@
 from db import get_db_connection
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from app.utils import get_userid_from_token
+from app.utils import get_userid_from_token,format_rfc1123_to_date
 customers_bp = Blueprint("customers", __name__)
 
+
+@customers_bp.route("/customers",methods=["GET"])
+@jwt_required()
+def get_all_users():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(users)
 @customers_bp.route("/customers/<int:user_id>",methods=["GET"])
 @jwt_required()
 def get_users(user_id):
@@ -11,6 +22,8 @@ def get_users(user_id):
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM customers WHERE id = %s",(user_id, ))
     users = cursor.fetchone()
+    if users.get('birth_date'):
+        users['birth_date'] = format_rfc1123_to_date(users['birth_date'])
     cursor.close()
     conn.close()
     return jsonify(users)
@@ -102,3 +115,14 @@ def get_invoices_of_user(user_id):
     cursor.close()
     conn.close()
     return jsonify(invoices)
+@customers_bp.route("/customer/discounts/<int:customer_type_id>",methods=["GET"])
+@jwt_required()
+def get_customer_discount(customer_type_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT customer_type,discount FROM discounts WHERE id = %s",(customer_type_id, ))
+    data = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(data)
+    

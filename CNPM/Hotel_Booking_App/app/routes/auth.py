@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token,jwt_required
 import mysql.connector as connect
 from db import get_db_connection
 from datetime import timedelta
 import random
-from app.utils import get_db_connection,get_old_passwords,send_email,is_new_password_valid,is_valid_password
+from app.utils import get_db_connection,get_old_passwords,send_email,is_new_password_valid,is_valid_password, get_userid_from_token
 from time import time
 
 otp_storage = {}
@@ -92,15 +92,18 @@ def login():
         query = f"SELECT username, password, id, role FROM customers WHERE {field} = %s"
         cursor.execute(query, (identifier,))
         user = cursor.fetchone()
-        cursor.close()
-        conn.close()
+        
 
         if user and user[1] == password:
             access_token = create_access_token(identity=user[0],expires_delta=timedelta(hours=1))
+            action = "Login"
+            cursor.execute("INSERT INTO log(customer_id, action) VALUES(%s,%s)",(user[2],action))
+            conn.commit()
             return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2], "role": user[3]}), 200
         else:
             return jsonify({"error": "Sai username/email hoặc password"}), 401
-
+        cursor.close()
+        conn.close()
     except connect.Error as err:
         return jsonify({"error": str(err)}), 500  
 @auth_bp.route("/forgot-password", methods=["POST"])
@@ -163,3 +166,14 @@ def reset_password():
     del otp_storage[email]
 
     return jsonify({"message": "Đặt lại mật khẩu thành công"}), 200
+@auth_bp.route("/logout",methods=["POST"])
+@jwt_required()
+def logout():
+    data = request.json
+    action = data.get("action")
+    id = get_userid_from_token()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO log(customer_id, action) VALUES(%s,%s)",(id,action))
+    conn.commit()
+    return jsonify({"message":"Đăng xuất thành công, hẹn gặp lại!"})

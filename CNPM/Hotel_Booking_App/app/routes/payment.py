@@ -25,7 +25,7 @@ def payment_vnpay():
     else:
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
     print(total_price,pay_money)
-    if abs(total_price * Decimal(0.7) - pay_money) < Decimal(0.01):
+    if abs(total_price - pay_money) < Decimal(0.01):
         cursor.execute("INSERT INTO payment (invoices_id,total_money,pay_description,type_of_payment,card_number,card_type) VALUES  (%s,%s,%s,%s,%s,%s)",(invoices_id,pay_money,pay_description,type_of_payment,number,card_type))
         conn.commit()
         cursor.execute("UPDATE invoices SET state =%s WHERE id = %s",(state,invoices_id))
@@ -44,7 +44,7 @@ def payment_card():
     card_type = data.get("card_type")
     pay_money = Decimal(data.get("total_money"))  
     pay_description = data.get("description")
-    
+    print(pay_money)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -52,13 +52,12 @@ def payment_card():
     total = cursor.fetchone()
     
     if total:
-        total_price = Decimal(total.get("total_price"))  # Chuyển total_price thành Decimal
+        total_price = Decimal(total.get("total_price"))  
         print(total_price)
     else:
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
-    
-    # Kiểm tra sự khác biệt giữa 70% giá trị total_price và pay_money
-    if abs(total_price * Decimal(0.7) - pay_money) < Decimal(0.01):  # Sử dụng Decimal cho phép toán
+    print(abs(total_price-pay_money))
+    if abs(total_price - pay_money) < Decimal(0.01):
         cursor.execute("INSERT INTO payment (invoices_id, total_money, pay_description, type_of_payment, card_number, card_type) VALUES  (%s, %s, %s, %s, %s, %s)", 
                        (invoices_id, pay_money, pay_description, type_of_payment, card_number, card_type))
         conn.commit()
@@ -70,7 +69,6 @@ def payment_card():
     else:
         return jsonify({"message": "Vui lòng thanh toán đúng số tiền!"})
 @payment_bp.route("/payment/banking",methods=["POST"])
-@jwt_required()
 def payment_banking():
     data = request.json
     invoices_id = data.get("invoices_id")
@@ -94,7 +92,7 @@ def payment_banking():
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
     
     # Kiểm tra sự khác biệt giữa 70% giá trị total_price và pay_money
-    if abs(total_price * Decimal(0.7) - pay_money) < Decimal(0.01):  # Sử dụng Decimal cho phép toán
+    if abs(total_price - pay_money) < Decimal(0.01):  # Sử dụng Decimal cho phép toán
         cursor.execute("INSERT INTO payment (invoices_id, total_money, pay_description, type_of_payment, card_number, card_type) VALUES  (%s, %s, %s, %s, %s, %s)", 
                        (invoices_id, pay_money, pay_description, type_of_payment, card_number, card_type))
         conn.commit()
@@ -105,4 +103,11 @@ def payment_banking():
         return jsonify({"message": f"Thanh Toán thành công đơn hàng {invoices_id} bằng {card_type}!"}), 201
     else:
         return jsonify({"message": "Vui lòng thanh toán đúng số tiền!"})
-    
+@payment_bp.route("/payment/<int:invoice_id>",methods=["GET"])
+@jwt_required()
+def get_payment_info(invoice_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM payment WHERE invoices_id = %s",(invoice_id, ))
+    data = cursor.fetchone()
+    return jsonify(data)

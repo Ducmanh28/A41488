@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <title>Thanh Toán Thẻ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body class="container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">HotelBooking</a>
+        </div>
+    </nav>
+    <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
     <h2>Thanh toán bằng thẻ</h2>
     <form id="cardForm">
         <div class="mb-3">
@@ -21,7 +28,7 @@
             <input type="text" id="cardNumber" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label for="totalMoney" class="form-label">Số tiền thanh toán (70%)</label>
+            <label for="totalMoney" class="form-label">Số tiền thanh toán</label>
             <input type="text" id="totalMoney" class="form-control" readonly>
         </div>
         <div class="mb-3">
@@ -39,7 +46,7 @@
 
         async function fetchInvoiceTotal() {
             try {
-                const res = await fetch(`http://127.0.0.1:5000/invoices/${invoices_id}`, {
+                const res = await fetch(`https://api.ducmanhsuncloud.click/invoices/${invoices_id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -51,8 +58,8 @@
 
                 const data = await res.json();
                 const total = data.total_price || data.invoice?.total_price;
-                payAmount = (total * 0.7).toFixed(2);
-                document.getElementById("totalMoney").value = `${Number(payAmount).toLocaleString()} VND`;
+                document.getElementById("totalMoney").value = `${Number(total).toLocaleString()} VND`;
+                localStorage.setItem("totalmoney",total)
             } catch (error) {
                 alert(error.message);
             }
@@ -65,9 +72,9 @@
             const card_type = document.getElementById("cardType").value;
             const card_number = document.getElementById("cardNumber").value;
             const description = document.getElementById("description").value;
-            
+            const total = localStorage.getItem("totalmoney")
             try {
-                const res = await fetch(`http://127.0.0.1:5000/payment/card`, {
+                const res = await fetch(`https://api.ducmanhsuncloud.click/payment/card`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -77,7 +84,7 @@
                         invoices_id,
                         card_type,
                         card_number,
-                        total_money: parseFloat(payAmount),
+                        total_money: parseFloat(total),
                         description
                     })
                 });
@@ -86,6 +93,8 @@
 
                 if (res.ok) {
                     alert(result.message);
+                    alert("Quay trở về Trang Chủ!")
+                    window.location.href = "home1.html";
                 } else {
                     alert(`Lỗi: ${result.message}`);
                 }
@@ -93,6 +102,9 @@
                 alert("Lỗi gửi yêu cầu thanh toán.");
             }
         });
+        function goBack() {
+            window.history.back();
+        }
     </script>
 </body>
 </html>

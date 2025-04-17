@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <title>Thanh Toán VNPAY</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body class="container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">HotelBooking</a>
+        </div>
+    </nav>
+    <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
     <h2>Thanh toán VNPAY</h2>
     <form id="vnpayForm">
         <div class="mb-3">
@@ -35,7 +42,7 @@
             
         async function fetchInvoiceTotal() {
             try {
-                const res = await fetch(`http://127.0.0.1:5000/invoices/${invoices_id}`, {
+                const res = await fetch(`https://api.ducmanhsuncloud.click/invoices/${invoices_id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -46,9 +53,9 @@
                 if (!res.ok) throw new Error("Lấy thông tin hóa đơn thất bại");
 
                 const data = await res.json();
-                const total = data.total_price || data.invoice?.total_price;
-                payAmount = (total * 0.7).toFixed(2);
-                document.getElementById("totalMoney").value = `${Number(payAmount).toLocaleString()} VND`;
+                const totals = data.total_price || data.invoice?.total_price;
+                localStorage.setItem("totalmn",totals)
+                document.getElementById("totalMoney").value = `${Number(totals).toLocaleString()} VND`;
                 document.getElementById("idhoadon").value = `${invoices_id}`
                 console.log(Number(payAmount).toLocaleString())
             } catch (error) {
@@ -61,18 +68,24 @@
             e.preventDefault();
             const description = document.getElementById("description").value;
             const card_number = document.getElementById("number").value;
-            const res = await fetch(`http://127.0.0.1:5000/payment/vnpay/${invoiceId}`, {
+            const total= localStorage.getItem("totalmn")
+            const res = await fetch(`https://api.ducmanhsuncloud.click/payment/vnpay/${invoiceId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({ total_money, description,card_number })
+                body: JSON.stringify({ total, description,card_number })
             });
 
             const result = await res.json();
             alert(result.message);
+            alert("Quay trở về trang chủ")
+            window.location.href = "home1.html"
         });
+        function goBack() {
+            window.history.back();
+        }
     </script>
 </body>
 </html>

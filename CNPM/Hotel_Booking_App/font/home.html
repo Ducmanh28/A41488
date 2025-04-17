@@ -17,9 +17,10 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
     </style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="home.html">HotelBooking</a>
             <div class="ms-auto">
@@ -29,7 +30,7 @@
         </div>
     </nav>
     <div class="container mt-4">
-        <h2 class="text-center">Đi tới bất cứ đâu bạn muốn với Hotel Booking</h2>
+        <h2 class="text-center">Đi đâu đi đó, có Hotel Booking lo</h2>
         <form id="search-form" class="row g-3">
             <div class="col-md-4">
                 <label for="area" class="form-label">Khu vực</label>
@@ -54,9 +55,8 @@
                 Deal hời thoải mái đón hè!
             </h3>
         </div>
-        
+    
         <script>
-            // Thêm đoạn JavaScript cho hiệu ứng nhấp nháy
             const style = document.createElement('style');
             style.innerHTML = `
                 @keyframes blinker {
@@ -64,19 +64,29 @@
                         opacity: 0;
                     }
                 }
+                #adCarousel .carousel-inner {
+                    transition: transform 1s ease-in-out !important;
+                }
             `;
             document.head.appendChild(style);
         </script>
-        <div id="adCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+    
+        <div id="adCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" style="overflow: hidden;">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="/CNPM/Hotel_Booking_App/font/Hotel/Quang_Cao/qc1.jpg" class="d-block w-100" alt="Quảng cáo 1">
+                    <div class="d-block w-100"
+                         style="height: 300px; background: url('https://ducmanhsuncloud.click/Hotel/Quang_Cao/qc1.jpg') center center / cover no-repeat;">
+                    </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="/CNPM/Hotel_Booking_App/font/Hotel/Quang_Cao/qc2.jpg" class="d-block w-100" alt="Quảng cáo 2">
+                    <div class="d-block w-100"
+                         style="height: 300px; background: url('https://ducmanhsuncloud.click/Hotel/Quang_Cao/qc2.jpg') center center / cover no-repeat;">
+                    </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="/CNPM/Hotel_Booking_App/font/Hotel/Quang_Cao/qc3.jpg" class="d-block w-100" alt="Quảng cáo 3">
+                    <div class="d-block w-100"
+                         style="height: 300px; background: url('https://ducmanhsuncloud.click/Hotel/Quang_Cao/qc3.jpg') center center / cover no-repeat;">
+                    </div>
                 </div>
             </div>
     
@@ -91,15 +101,14 @@
             </button>
         </div>
     </div>
-    
     <div class="container mt-4">
-        <h2 class="text-center">Danh sách khách sạn</h2>
+        <h2 class="text-center">Những khách sạn hàng đầu</h2>
         <div id="hotel-list" class="row"></div>
     </div>
     <script>
         async function fetchHotels(queryParams = "") {
             try {
-                let response = await fetch(`http://127.0.0.1:5000/hotels${queryParams}`);
+                let response = await fetch(`https://api.ducmanhsuncloud.click/hotels${queryParams}`);
                 let hotels = await response.json();
 
                 let hotelList = document.getElementById("hotel-list");

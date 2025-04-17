@@ -5,6 +5,7 @@ from config import Config
 import re
 from flask_jwt_extended import get_jwt_identity
 from db import get_db_connection
+from datetime import datetime, date
 
 def send_email(receiver_email, otp_code):
     try:
@@ -42,10 +43,10 @@ def is_valid_password(password):
 def get_userid_from_token():
     user_name = get_jwt_identity()
     conn = get_db_connection()
-    curosr = conn.cursor()
-    curosr.execute("SELECT id FROM customers WHERE username = %s",(user_name, ))
-    user_id = curosr.fetchone()
-    curosr.close()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM customers WHERE username = %s",(user_name, ))
+    user_id = cursor.fetchone()
+    cursor.close()
     conn.close()
     if user_id:
         return user_id[0]
@@ -60,3 +61,30 @@ def get_hotel_id_from_room_id(room_id):
     if hotel_id_tuple:
         return hotel_id_tuple[0]
     return None
+def format_rfc1123_to_date(date_input):
+    if isinstance(date_input, str):
+        date_obj = datetime.strptime(date_input, '%a, %d %b %Y %H:%M:%S GMT')
+        return date_obj.date().isoformat()
+    elif isinstance(date_input, (datetime, date)):
+        return date_input.isoformat()
+    else:
+        return None  # hoặc raise ValueError("Invalid date input")
+def get_service_id(service_name):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id FROM additionalservices WHERE service_name = %s",(service_name, ))
+    id = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if id:
+        return id["id"]
+    return None
+def get_sql_aggregation(report_type):
+    if report_type == 'revenue':
+        return "SUM(total_price)"
+    elif report_type == 'orders':
+        return "COUNT(id)"
+    elif report_type == 'customers':
+        return "COUNT(DISTINCT customer_id)"
+    else:
+        return "COUNT(id)"
