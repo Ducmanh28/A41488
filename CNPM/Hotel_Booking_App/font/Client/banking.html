@@ -68,7 +68,7 @@
 
         async function loadInvoice() {
             try {
-                const res = await authFetch(`https://api.ducmanhsuncloud.click/invoices/${invoices_id}`);
+                const res = await authFetch(`http://127.0.0.1/invoices/${invoices_id}`);
                 const invoice = await res;
                 const total = invoice.total_price;
                 console.log(total)
@@ -87,7 +87,7 @@
             const description = document.getElementById("description").value;
             const total_money = document.getElementById("totalAmount").value;
             try{
-                const conres = await fetch(`https://api.ducmanhsuncloud.click/payment/banking`,{
+                const conres = await fetch(`http://127.0.0.1/payment/banking`,{
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

@@ -208,7 +208,7 @@
     const type = document.getElementById('report-type').value;
     const range = document.getElementById('report-range').value;
     const year = document.getElementById('report-year').value;
-    fetch(`https://api.ducmanhsuncloud.click/admin/customers/total`,{
+    fetch(`http://127.0.0.1/admin/customers/total`,{
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -219,7 +219,7 @@
   .then((cusdata)=> {
     document.getElementById("User-total").innerText = cusdata.count;
   })
-  fetch(`https://api.ducmanhsuncloud.click/admin/hotels/total`,{
+  fetch(`http://127.0.0.1/admin/hotels/total`,{
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -230,7 +230,7 @@
 .then((hoteldata)=> {
   document.getElementById("Hotel-total").innerText = hoteldata.count;
 })
-fetch(`https://api.ducmanhsuncloud.click/admin/invoices/total`,{
+fetch(`http://127.0.0.1/admin/invoices/total`,{
   method: "GET",
   headers: {
     "Content-Type": "application/json",
@@ -241,7 +241,7 @@ fetch(`https://api.ducmanhsuncloud.click/admin/invoices/total`,{
 .then((invoicedata)=> {
 document.getElementById("Order-total").innerText = invoicedata.count;
 })
-fetch(`https://api.ducmanhsuncloud.click/admin/payment/total`,{
+fetch(`http://127.0.0.1/admin/payment/total`,{
   method: "GET",
   headers: {
     "Content-Type": "application/json",
@@ -252,7 +252,7 @@ fetch(`https://api.ducmanhsuncloud.click/admin/payment/total`,{
 .then((paymentdata)=> {
 document.getElementById("Money-total").innerText = paymentdata.total;
 })
-    fetch(`https://api.ducmanhsuncloud.click/customers/${admin_Id}`,{
+    fetch(`http://127.0.0.1/customers/${admin_Id}`,{
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -264,7 +264,7 @@ document.getElementById("Money-total").innerText = paymentdata.total;
       document.getElementById("admin-name").innerText = admindata.full_name;
       localStorage.setItem("ADMINNAME",admindata.full_name)
     })
-    fetch(`https://api.ducmanhsuncloud.click/admin/report`, {
+    fetch(`http://127.0.0.1/admin/report`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -323,7 +323,7 @@ document.getElementById("Money-total").innerText = paymentdata.total;
     const token = localStorage.getItem("access_token");
 
     try {
-      const response = await fetch("https://api.ducmanhsuncloud.click/logout", {
+      const response = await fetch("http://127.0.0.1/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

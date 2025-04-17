@@ -46,7 +46,7 @@
 
         async function fetchInvoiceTotal() {
             try {
-                const res = await fetch(`https://api.ducmanhsuncloud.click/invoices/${invoices_id}`, {
+                const res = await fetch(`http://127.0.0.1/invoices/${invoices_id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -74,7 +74,7 @@
             const description = document.getElementById("description").value;
             const total = localStorage.getItem("totalmoney")
             try {
-                const res = await fetch(`https://api.ducmanhsuncloud.click/payment/card`, {
+                const res = await fetch(`http://127.0.0.1/payment/card`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

@@ -82,7 +82,7 @@
                 return;
             }
         
-            const apiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}`;
+            const apiUrl = `http://127.0.0.1/hotels/${hotelId}`;
         
             try {
                 let response = await fetch(apiUrl);
@@ -106,7 +106,7 @@
         }
 
         async function fetchRoomTypes(hotelId) {
-            const roomApiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}/roomtypes`;
+            const roomApiUrl = `http://127.0.0.1/hotels/${hotelId}/roomtypes`;
 
             try {
                 let response = await fetch(roomApiUrl);
@@ -144,7 +144,7 @@
         }
 
         async function viewRoomDetails(roomId) {
-            const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
+            const apiUrl = `http://127.0.0.1/roomtypes/${roomId}`;
 
             try {
                 let response = await fetch(apiUrl);
@@ -167,7 +167,7 @@
 
         async function selectRoom(roomId) {
             try {
-                const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
+                const apiUrl = `http://127.0.0.1/roomtypes/${roomId}`;
                 let response = await fetch(apiUrl);
                 if (!response.ok) throw new Error("Không thể lấy dữ liệu phòng.");
         

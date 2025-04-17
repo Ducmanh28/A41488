@@ -39,7 +39,7 @@
                 [isEmail ? 'email' : 'username']: usernameOrEmail,
                 password: password
             };
-            fetch(`https://api.ducmanhsuncloud.click/login`, {
+            fetch(`http://127.0.0.1/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)

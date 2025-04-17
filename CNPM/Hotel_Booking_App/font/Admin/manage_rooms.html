@@ -190,7 +190,7 @@
       const token = localStorage.getItem("access_token");
       const adminID = localStorage.getItem("customer_id")
       document.getElementById("admin-name").innerText = localStorage.getItem("ADMINNAME");
-      fetch("https://api.ducmanhsuncloud.click/hotels",{
+      fetch("http://127.0.0.1/hotels",{
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
@@ -215,7 +215,7 @@
       async function loadRooms() {
         tbody.innerHTML = "";
         try {
-          const response = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes`, {
+          const response = await fetch(`http://127.0.0.1/admin/roomtypes`, {
             headers: { 
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}` }
@@ -243,7 +243,7 @@
             btn.addEventListener("click", async (e) => {
               const id = e.target.dataset.id;
               console.log(id)
-              const res = await fetch(`https://api.ducmanhsuncloud.click/roomtypes/${id}`, {
+              const res = await fetch(`http://127.0.0.1/roomtypes/${id}`, {
                 headers: { 
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}` }
@@ -267,7 +267,7 @@
               const action = "Delete Room"
               if (confirm("Bạn có chắc chắn muốn xóa phòng này?")) {
                 try {
-                  const res = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/${id}`, {
+                  const res = await fetch(`http://127.0.0.1/admin/roomtypes/${id}`, {
                     method: "DELETE",
                     headers: { 
                         "Content-Type": "application/json",
@@ -275,7 +275,7 @@
                   });
                   const result = await res.json();
                   alert(result.message || "Xóa thành công!");
-                  const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+                  const logres = await fetch(`http://127.0.0.1/admin/logs`,{
                     method: "POST",
                     headers:{ 
                       "Content-Type": "application/json",
@@ -319,7 +319,7 @@
   
         try {
           const action = "Create Room"
-          const res = await fetch("https://api.ducmanhsuncloud.click/admin/roomtypes/create", {
+          const res = await fetch("http://127.0.0.1/admin/roomtypes/create", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -329,7 +329,7 @@
           });
           const result = await res.json();
           alert(result.message || "Tạo thành công!");
-          const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+          const logres = await fetch(`http://127.0.0.1/admin/logs`,{
             method: "POST",
             headers:{ 
               "Content-Type": "application/json",
@@ -362,7 +362,7 @@
         };
   
         try {
-          const res = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/${roomId}`, {
+          const res = await fetch(`http://127.0.0.1/admin/roomtypes/${roomId}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -373,7 +373,7 @@
           const result = await res.json();
           alert(result.message || "Cập nhật thành công!");
           const action = "Update Room"
-          const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+          const logres = await fetch(`http://127.0.0.1/admin/logs`,{
             method: "POST",
             headers:{ 
               "Content-Type": "application/json",
@@ -402,7 +402,7 @@
       const token = localStorage.getItem("access_token");
   
       try {
-        const response = await fetch("https://api.ducmanhsuncloud.click/logout", {
+        const response = await fetch("http://127.0.0.1/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -435,7 +435,7 @@
         const tbody = document.getElementById("room-table-body");
         const accesstoken = localStorage.getItem("access_token");
         try {
-            let response = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/find`, {
+            let response = await fetch(`http://127.0.0.1/admin/roomtypes/find`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -488,7 +488,7 @@
               const action = "Delete Room"
               if (confirm("Bạn có chắc chắn muốn xóa phòng này?")) {
                 try {
-                  const res = await fetch(`https://api.ducmanhsuncloud.click/admin/roomtypes/${id}`, {
+                  const res = await fetch(`http://127.0.0.1/admin/roomtypes/${id}`, {
                     method: "DELETE",
                     headers: { 
                         "Content-Type": "application/json",
@@ -496,7 +496,7 @@
                   });
                   const result = await res.json();
                   alert(result.message || "Xóa thành công!");
-                  const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
+                  const logres = await fetch(`http://127.0.0.1/admin/logs`,{
                     method: "POST",
                     headers:{ 
                       "Content-Type": "application/json",
@@ -521,7 +521,7 @@
             btn.addEventListener("click", async (e) => {
               const id = e.target.dataset.id;
               console.log(id)
-              const res = await fetch(`https://api.ducmanhsuncloud.click/roomtypes/${id}`, {
+              const res = await fetch(`http://127.0.0.1/roomtypes/${id}`, {
                 headers: { 
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${accesstoken}` }
