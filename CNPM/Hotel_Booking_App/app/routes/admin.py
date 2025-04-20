@@ -655,19 +655,23 @@ def create_invoices():
         # Tính tổng tiền
         total_price = Decimal(room_price * num_nights + total_service_price)
         total_price -= (Decimal(discount) / 100) * total_price
-
+        
         # Insert hóa đơn
         cursor.execute("""
             INSERT INTO invoices (
                 customer_id, room_type_id, check_in, check_out, total_price, hotel_id,
-                is_for_someone_else, other_person_name, other_person_ccid
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                is_for_someone_else, other_person_name, other_person_ccid,room_number
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """, (
             customer_id, room_type_id, check_in, check_out, total_price, hotel_id,
-            forwho, anothercustomer if forwho else None, anotherccid if forwho else None
+            forwho, anothercustomer if forwho else None, anotherccid if forwho else None,room
         ))
         invoice_id = cursor.lastrowid
-
+        cursor.execute("SELECT room_number FROM busy_room WHERE hotel_id=%s AND room_type_id=%s AND state='Free'",(hotel_id,room_type_id))
+        rooms = cursor.fetchall()
+        room = rooms[0][0]
+        cursor.execute("UPDATE busy_room SET state='Busy',busy_from=%s,busy_to=%s,invoice_id=%s WHERE hotel_id=%s AND room_type_id=%s AND room_number=%s",(check_in_date,check_out_date,invoice_id,hotel_id,room_type_id,room))
+        conn.commit()
         # Gán dịch vụ bổ sung
         for service_id in additional_services:
             cursor.execute("""
@@ -683,6 +687,7 @@ def create_invoices():
         conn.commit()
         return jsonify({
             "message": "Đặt phòng thành công",
+            "room_number": room,
             "invoice_id": invoice_id,
             "total_price": float(total_price)
         }), 201
@@ -749,6 +754,13 @@ def delete_invoices(invoice_id):
     customer_id = get_userid_from_token()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT hotel_id, room_type_id,room_number From invoices where id=%s",(invoice_id,))
+    data = cursor.fetchone()
+    hotel_id = data["hotel_id"]
+    room_type_id = data["room_type_id"]
+    room_number = data["room_number"]
+    cursor.execute("UPDATE busy_room set state = 'Free',invoice_id=NULL,busy_from=NULL,busy_to=NULL where hotel_id = %s and room_type_id=%s and room_number=%s",(hotel_id,room_type_id,room_number))
+    conn.commit()
     cursor.execute("DELETE FROM invoices WHERE id = %s",(invoice_id,))
     conn.commit()
     cursor.close()
@@ -900,3 +912,93 @@ def updated_invoicess(invoices_id):
     finally:
         cursor.close()
         conn.close()
+@admin_bp.route("/admin/schedules",methods=["GET"])
+@jwt_required()
+def get_schedules():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM busy_room WHERE busy_to IS NOT NULL;")
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(data)
+@admin_bp.route("/admin/schedules/<int:schedules_id>",methods=["GET"])
+@jwt_required()
+def get_schedules_byid(schedules_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM busy_room WHERE id=%s",(schedules_id,))
+    data = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(data)
+@admin_bp.route("/admin/schedules/<int:schedules_id>/get_name",methods=["POST"])
+@jwt_required()
+def get_schedules_name_byid(schedules_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM busy_room WHERE id=%s",(schedules_id,))
+    data = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify(data)
+@admin_bp.route("/admin/schedules/<int:schedules_id>",methods=["DELETE"])
+@jwt_required()
+def delete_schedules(schedules_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE busy_room SET busy_from=NULL,busy_to=NULL,state='Free',invoice_id=NULL WHERE id=%s",(schedules_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+@admin_bp.route("/admin/schedules/create",methods=["POST"])
+@jwt_required()
+def create_schedules():
+    data = request.json
+    hotel_id = data.get("hotel_id")
+    room_type_id = data.get("room_type_id")
+    room_number = data.get("room_number")
+    busy_from = data.get("busy_from")
+    busy_to = data.get("busy_to")
+    state = "Busy"
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT busy_from FROM busy_room WHERE hotel_id = %s AND room_type_id = %s AND room_number = %s",(hotel_id,room_type_id,room_number))
+    invoice_id = cursor.fetchone()
+    if invoice_id:
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Không thể tạo lịch do đã có lịch cho phòng này!"})
+    else:
+        cursor.execute("UPDATE busy_room SET busy_from=%s,busy_to=%s,state=%s  WHERE hotel_id = %s AND room_type_id = %s AND room_number=%s",(busy_from,busy_to,state,hotel_id,room_type_id,room_number))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message":"Thêm lịch thành công"})
+@admin_bp.route("/admin/schedules/<int:room_type_id>/roomnumber",methods=["GET"])
+@jwt_required()
+def get_room_free(room_type_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT room_number FROM busy_room WHERE room_type_id = %s AND state='Free'",(room_type_id,))
+    data = cursor.fetchall()
+    return jsonify(data)
+@admin_bp.route("/admin/schedules/find",methods=["POST"])
+@jwt_required()    
+def find_schedules():
+    data = request.json
+    search_type = data.get("type")
+    type_data = data.get("type_data")
+    allowed_fields = ["room_number", "hotel_id", "room_type_id","state"]
+    if search_type not in allowed_fields:
+        return jsonify({"error": "Trường tìm kiếm không hợp lệ!"}), 400
+    query = f"SELECT * FROM busy_room WHERE {search_type} = %s"
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query, (type_data,))
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    if not result:
+        return jsonify({"message": "Không tìm thấy!"}), 404
+    return jsonify(result)

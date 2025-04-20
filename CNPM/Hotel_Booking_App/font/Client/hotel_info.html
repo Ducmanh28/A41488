@@ -16,7 +16,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="home.html">HotelBooking</a>
+            <a class="navbar-brand" href="home1.html">HotelBooking</a>
         </div>
     </nav>
 
@@ -82,7 +82,7 @@
                 return;
             }
         
-            const apiUrl = `http://127.0.0.1:5000/hotels/${hotelId}`;
+            const apiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}`;
         
             try {
                 let response = await fetch(apiUrl);
@@ -106,7 +106,7 @@
         }
 
         async function fetchRoomTypes(hotelId) {
-            const roomApiUrl = `http://127.0.0.1:5000/hotels/${hotelId}/roomtypes`;
+            const roomApiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}/roomtypes`;
 
             try {
                 let response = await fetch(roomApiUrl);
@@ -144,7 +144,7 @@
         }
 
         async function viewRoomDetails(roomId) {
-            const apiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
+            const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
 
             try {
                 let response = await fetch(apiUrl);
@@ -167,7 +167,7 @@
 
         async function selectRoom(roomId) {
             try {
-                const apiUrl = `http://127.0.0.1:5000/roomtypes/${roomId}`;
+                const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
                 let response = await fetch(apiUrl);
                 if (!response.ok) throw new Error("Không thể lấy dữ liệu phòng.");
         

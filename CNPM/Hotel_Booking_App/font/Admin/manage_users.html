@@ -81,7 +81,7 @@
     </div>
     <div class="content-wrapper p-4">
       <div class="mb-4">
-        <h3 class="fw-bold mb-3">Danh sách Phòng</h3>
+        <h3 class="fw-bold mb-3">Danh sách Khách hàng</h3>
         <div class="row g-3 align-items-end">
           <div class="col-md-4">
             <div class="mb-2">
@@ -187,7 +187,7 @@
       async function loadUsers() {
         tbody.innerHTML = "";
         try {
-          const response = await fetch(`http://127.0.0.1:5000/admin/customers/${adminID}`, {
+          const response = await fetch(`https://api.ducmanhsuncloud.click/admin/customers/${adminID}`, {
             headers: { "Authorization": `Bearer ${token}` }
           });
           const data = await response.json();
@@ -211,7 +211,7 @@
           document.querySelectorAll(".btn-edit").forEach(btn =>
             btn.addEventListener("click", async (e) => {
               const id = e.target.dataset.id;
-              const res = await fetch(`http://127.0.0.1:5000/customers/${id}`, {
+              const res = await fetch(`https://api.ducmanhsuncloud.click/customers/${id}`, {
                 headers: { "Authorization": `Bearer ${token}` }
               });
               const user = await res.json();
@@ -232,13 +232,13 @@
               const action = "Delete User"
               if (confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
                 try {
-                  const res = await fetch(`http://127.0.0.1:5000/admin/customers/${id}`, {
+                  const res = await fetch(`https://api.ducmanhsuncloud.click/admin/customers/${id}`, {
                     method: "DELETE",
                     headers: { "Authorization": `Bearer ${token}` }
                   });
                   const result = await res.json();
                   alert(result.message || "Xóa thành công!");
-                  const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
+                  const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
                     method: "POST",
                     headers:{ 
                       "Content-Type": "application/json",
@@ -279,7 +279,7 @@
   
         try {
           const action = "Create User"
-          const res = await fetch("http://127.0.0.1:5000/admin/customers/create_user", {
+          const res = await fetch("https://api.ducmanhsuncloud.click/admin/customers/create_user", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -289,7 +289,7 @@
           });
           const result = await res.json();
           alert(result.message || "Tạo thành công!");
-          const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
+          const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
             method: "POST",
             headers:{ 
               "Content-Type": "application/json",
@@ -319,7 +319,7 @@
         };
   
         try {
-          const res = await fetch(`http://127.0.0.1:5000/admin/customers/${userId}`, {
+          const res = await fetch(`https://api.ducmanhsuncloud.click/admin/customers/${userId}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -330,7 +330,7 @@
           const result = await res.json();
           alert(result.message || "Cập nhật thành công!");
           const action = "Update User"
-          const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
+          const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
             method: "POST",
             headers:{ 
               "Content-Type": "application/json",
@@ -356,7 +356,7 @@
       const token = localStorage.getItem("access_token");
   
       try {
-        const response = await fetch("http://127.0.0.1:5000/logout", {
+        const response = await fetch("https://api.ducmanhsuncloud.click/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -389,7 +389,7 @@
       const tbody = document.getElementById("user-table-body");
       const accesstoken = localStorage.getItem("access_token");
       try {
-          let response = await fetch(`http://127.0.0.1:5000/admin/customers/find`, {
+          let response = await fetch(`https://api.ducmanhsuncloud.click/admin/customers/find`, {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
@@ -430,7 +430,7 @@
       document.querySelectorAll(".btn-edit").forEach(btn =>
             btn.addEventListener("click", async (e) => {
               const id = e.target.dataset.id;
-              const res = await fetch(`http://127.0.0.1:5000/customers/${id}`, {
+              const res = await fetch(`https://api.ducmanhsuncloud.click/customers/${id}`, {
                 headers: { "Authorization": `Bearer ${accesstoken}` }
               });
               const user = await res.json();
@@ -451,13 +451,13 @@
               const action = "Delete User"
               if (confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
                 try {
-                  const res = await fetch(`http://127.0.0.1:5000/admin/customers/${id}`, {
+                  const res = await fetch(`https://api.ducmanhsuncloud.click/admin/customers/${id}`, {
                     method: "DELETE",
                     headers: { "Authorization": `Bearer ${accesstoken}` }
                   });
                   const result = await res.json();
                   alert(result.message || "Xóa thành công!");
-                  const logres = await fetch(`http://127.0.0.1:5000/admin/logs`,{
+                  const logres = await fetch(`https://api.ducmanhsuncloud.click/admin/logs`,{
                     method: "POST",
                     headers:{ 
                       "Content-Type": "application/json",

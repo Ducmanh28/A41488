@@ -78,7 +78,7 @@
                 citizen_id: document.getElementById("citizen_id").value
             };
 
-            fetch("http://127.0.0.1/register", {
+            fetch("https://api.ducmanhsuncloud.click/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userData)
@@ -99,7 +99,7 @@
             let otp = document.getElementById("otp").value;
             userData.otp = otp;  // Thêm OTP vào dữ liệu đăng ký
 
-            fetch("http://127.0.0.1/register", {
+            fetch("https://api.ducmanhsuncloud.click/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userData)

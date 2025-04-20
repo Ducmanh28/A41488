@@ -28,23 +28,14 @@ def find_hotel():
     area = data.get("area")
     check_in = data.get("check_in")
     check_out = data.get("check_out")
-    status = "Available"
+    status = "Available"  # Trạng thái phòng phải là "Free"
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     # Lấy danh sách khách sạn theo khu vực
-    cursor.execute("SELECT * FROM hotels WHERE area = %s AND status = %s",(area,status ))
+    cursor.execute("SELECT * FROM hotels WHERE area = %s AND status = %s", (area, status))
     hotels = cursor.fetchall()
-
-    # Kiểm tra nếu bảng busy_room không có dữ liệu
-    cursor.execute("SELECT COUNT(*) as total FROM busy_room")
-    total_busy_rooms = cursor.fetchone()["total"]
-
-    if total_busy_rooms == 0:
-        cursor.close()
-        conn.close()
-        return jsonify(hotels)  
 
     # Danh sách khách sạn có phòng trống
     available_hotels = []
@@ -52,24 +43,30 @@ def find_hotel():
     for hotel in hotels:
         hotel_id = hotel["id"]
         
-        # Kiểm tra số lượng phòng bị bận trong khoảng thời gian nhập vào
+        # Kiểm tra xem tất cả các phòng của khách sạn có bận trong khoảng thời gian check_in, check_out
         cursor.execute("""
-            SELECT COUNT(*) as busy_count FROM busy_room 
-            WHERE hotel_id = %s AND (
+            SELECT COUNT(room_number) as busy_room_count
+            FROM busy_room 
+            WHERE hotel_id = %s AND state = 'Busy' AND (
                 (busy_from <= %s AND busy_to > %s) OR
                 (busy_from < %s AND busy_to >= %s) OR
                 (busy_from >= %s AND busy_to <= %s)
             )
         """, (hotel_id, check_in, check_in, check_out, check_out, check_in, check_out))
 
-        busy_count = cursor.fetchone()["busy_count"] or 0
+        busy_room_count = cursor.fetchone()["busy_room_count"] or 0
 
-        # Nếu không có phòng nào bị bận, thêm khách sạn vào danh sách khả dụng
-        if busy_count == 0:
+        # Lấy tổng số phòng của khách sạn
+        cursor.execute("SELECT COUNT(room_number) as total_rooms FROM busy_room WHERE hotel_id = %s", (hotel_id,))
+        total_rooms = cursor.fetchone()["total_rooms"]
+        print(total_rooms)
+        # Nếu tất cả các phòng đều bận trong khoảng thời gian check_in -> check_out, không thêm khách sạn vào danh sách
+        if busy_room_count < total_rooms:
             available_hotels.append(hotel)
 
     cursor.close()
     conn.close()
+
     return jsonify(available_hotels)
 @hotels_bp.route("/hotels/<int:hotel_id>/roomtypes",methods=["GET"])
 def get_roomtypes_of_hotels(hotel_id):

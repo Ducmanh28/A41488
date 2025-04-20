@@ -77,19 +77,22 @@ def create_invoices():
         total_price = Decimal(room_price*num_nights + total_service_price)
         print(total_price)
         total_price -= (Decimal(discount) / 100) * total_price
-
+        cursor.execute("SELECT room_number FROM busy_room WHERE hotel_id=%s AND room_type_id=%s AND state='Free'",(hotel_id,room_type_id))
+        rooms = cursor.fetchall()
+        room = rooms[0][0]
         # Insert hóa đơn
         cursor.execute("""
             INSERT INTO invoices (
                 customer_id, room_type_id, check_in, check_out, total_price, hotel_id,
-                is_for_someone_else, other_person_name, other_person_ccid
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                is_for_someone_else, other_person_name, other_person_ccid,room_number
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """, (
             customer_id, room_type_id, check_in, check_out, total_price, hotel_id,
-            forwho, anothercustomer if forwho else None, anotherccid if forwho else None
+            forwho, anothercustomer if forwho else None, anotherccid if forwho else None,room
         ))
         invoice_id = cursor.lastrowid
-
+        cursor.execute("UPDATE busy_room SET state='Busy',busy_from=%s,busy_to=%s,invoice_id=%s WHERE hotel_id=%s AND room_type_id=%s AND room_number=%s",(check_in_date,check_out_date,invoice_id,hotel_id,room_type_id,room))
+        conn.commit()
         # Gán dịch vụ bổ sung
         for service_id in service_ids:
             cursor.execute("""
@@ -101,7 +104,9 @@ def create_invoices():
         cursor.execute("""
             UPDATE roomtypes SET availability = availability - 1 WHERE id = %s
         """, (room_type_id,))
-
+        conn.commit()
+        action = "CREATE INVOICE"
+        cursor.execute("INSERT INTO log(customer_id,action) VALUES(%s,%s)",(customer_id,action))
         conn.commit()
         return jsonify({
             "message": "Đặt phòng thành công",

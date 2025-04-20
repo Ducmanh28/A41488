@@ -9,7 +9,7 @@
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="home.html">HotelBooking</a>
+            <a class="navbar-brand" href="home1.html">HotelBooking</a>
         </div>
     </nav>
     <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
@@ -33,7 +33,7 @@
                 </div>
                 <p><strong>Mã Hóa Đơn:</strong> <span id="idhoadon"></span></p>
                 <div class="mb-3">
-                    <label for="totalAmount" class="form-label"><strong>Số tiền thanh toán (70%)</strong></label>
+                    <label for="totalAmount" class="form-label"><strong>Số tiền thanh toán</strong></label>
                     <input type="text" id="totalAmount" class="form-control" readonly>
                 </div>
                 <div class="mb-3">
@@ -68,7 +68,7 @@
 
         async function loadInvoice() {
             try {
-                const res = await authFetch(`http://127.0.0.1:5000/invoices/${invoices_id}`);
+                const res = await authFetch(`https://api.ducmanhsuncloud.click/invoices/${invoices_id}`);
                 const invoice = await res;
                 const total = invoice.total_price;
                 console.log(total)
@@ -87,7 +87,7 @@
             const description = document.getElementById("description").value;
             const total_money = document.getElementById("totalAmount").value;
             try{
-                const conres = await fetch(`http://127.0.0.1:5000/payment/banking`,{
+                const conres = await fetch(`https://api.ducmanhsuncloud.click/payment/banking`,{
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
