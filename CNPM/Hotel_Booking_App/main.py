@@ -26,4 +26,4 @@ app.register_blueprint(payment_bp)
 app.register_blueprint(admin_bp)
 
 if __name__ == "__main__":
-    app.run(host="172.16.66.82", port=5000, debug=True)
+    app.run(host="192.168.1.46", port=5000, debug=True)

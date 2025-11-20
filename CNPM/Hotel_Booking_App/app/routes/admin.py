@@ -13,7 +13,7 @@ admin_bp = Blueprint("admin",__name__)
 @jwt_required()
 def get_logs():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)  # Sử dụng cursor với dictionary=True
+    cursor = conn.cursor(dictionary=True)  
     
     # Truy vấn lấy dữ liệu từ bảng log
     cursor.execute("SELECT * FROM log")
