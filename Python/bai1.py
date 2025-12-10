@@ -1,12 +1,8 @@
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
 from tkinter import *
-
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-from tkcalendar import DateEntry # Thư viện tạo lịch (giống ảnh)
+from tkcalendar import DateEntry 
 
 # --- 1. Hàm xử lý khi bấm nút Submit ---
 def submit_form():
