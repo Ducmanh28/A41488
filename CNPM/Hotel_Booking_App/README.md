@@ -50,7 +50,7 @@ Ban đầu người dùng sẽ cần đăng ký, sau đó đăng nhập vào h�
 - Chọn loại phòng
 - Chọn các dịch vụ thêm
 - Xem lại hóa đơn
-- Thanh toán trước 70% của hóa đơn(MOMO)
+- Thanh toán hóa đơn
 - Thanh toán thành công! Xác nhận đặt phòng!
 
 # Truy cập:
