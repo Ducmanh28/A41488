@@ -33,13 +33,7 @@ Là một ứng dụng đặt phòng khách sạn. Sử dụng ngôn ngữ lập
   - Xem và kiểm tra Log của trang web
 # Database
 Mô hình database của ứng dụng
-![](/Anh/Screenshot_1029.png)
 
-![](/Anh/Screenshot_1030.png)
-
-![](/Anh/Screenshot_1031.png)
-
-![](/Anh/Screenshot_1032.png)
 
 # Sơ đồ hoạt động
 ![](/Anh/Screenshot_1033.png)

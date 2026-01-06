@@ -3,71 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết khách sạn</title>
+    <title>Chi Tiết Khách Sạn | HotelBooking</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        .hotel-container { margin-top: 30px; }
-        .room-card { margin-top: 20px; }
-        .room-img { width: 100%; height: 200px; object-fit: cover; }
-        .room-info { padding: 15px; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- BANNER KHÁCH SẠN --- */
+        #hotel-details {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 16px;
+            padding: 80px 50px; /* Padding rộng hơn */
+            color: white;
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.4); /* Lớp phủ tối hơn chút để nổi chữ trắng */
+            margin-bottom: 40px;
+            overflow: hidden;
+            text-shadow: 1px 1px 10px rgba(0,0,0,0.8);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Đẩy nội dung xuống dưới */
+        }
+
+        .hotel-info-item {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        .hotel-info-item i {
+            width: 30px;
+            color: #ffc107;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        /* DESCRIPTION SECTION (Mới tách ra) */
+        .description-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border-left: 5px solid #0d6efd;
+        }
+
+        /* Room Cards */
+        .room-card {
+            border: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            overflow: hidden;
+            height: 100%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .room-img {
+            height: 240px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .room-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #dc3545;
+        }
+
+        /* Modal */
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-room-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        .main-footer {
+            background-color: #f2f2f2; /* Màu xám nhạt như ảnh */
+            color: #333;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            font-size: 0.95rem;
+        }
+        .footer-heading {
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            color: #212529;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        .footer-links a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover {
+            color: #0d6efd;
+            padding-left: 5px;
+        }
+        .company-info p {
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .logo-icon {
+            font-size: 3rem;
+            color: #5a67d8; /* Màu xanh tím giống ảnh */
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top py-3">
         <div class="container">
-            <a class="navbar-brand" href="home1.html">HotelBooking</a>
+            <a class="navbar-brand fw-bold fs-4" href="home1.html">
+                <i class="fa-solid fa-hotel me-2"></i>HotelBooking
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex align-items-center">
+                    <a href="/BLOG/blog.html" class="btn btn-outline-light me-2 rounded-pill px-3">BLOG</a>
+                    <a href="help.html" class="btn btn-outline-light me-2 rounded-pill px-3">
+                        <i class="fa-solid fa-circle-question me-1"></i> Trợ giúp
+                    </a>
+                    <a href="user.html" class="btn btn-outline-light me-2 rounded-pill px-3">
+                        <i class="fa-solid fa-user me-1"></i> Cá nhân
+                    </a>
+                    <button onclick="logout()" class="btn btn-danger rounded-pill px-3">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i> Đăng Xuất
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <div class="container hotel-container">
-        <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ Quay lại</button>
-        <h2 class="text-center" id="hotel-name">Đang tải...</h2>
+    <div class="container mt-4">
+        <button class="btn btn-light shadow-sm mb-4 fw-bold text-secondary rounded-pill px-4" onclick="goBack()">
+            <i class="fa-solid fa-arrow-left me-2"></i> Quay lại
+        </button>
 
-        <div class="card">
-            <div class="card-body" id="hotel-details" 
-            style="background-size: cover; background-position: center; border-radius: 15px; padding: 20px; color: white; text-shadow: 1px 1px 4px black;">
-                <p><strong>📍 Địa chỉ:</strong> <span id="hotel-address"></span></p>
-                <p><strong>📞 Hotline:</strong> <span id="hotel-hotline"></span></p>
-                <p><strong>📌 Khu vực:</strong> <span id="hotel-area"></span></p>
-                <p><strong>⭐ Số sao:</strong> <span id="hotel-rate"></span> sao</p>
-                <p><strong>💰 Giá:</strong> Từ <span id="hotel-price"></span>triệu</p>
-                <p><strong>🏨 Trạng thái:</strong> <span id="hotel-status"></span></p>
-                <p><strong>📝 Mô tả:</strong> <span id="hotel-description"></span></p>
-                <p><strong>✔ Đánh giá:</strong> <span id="hotel-review"></span></p>
-                <a href="#room-list" class="btn btn-primary">Xem phòng</a>
+        <div id="hotel-details" class="shadow-lg">
+            <div class="row w-100">
+                <div class="col-lg-9">
+                    <h1 class="fw-bold mb-3 display-4" id="hotel-name">Đang tải tên khách sạn...</h1>
+                    
+                    <div class="d-flex flex-wrap gap-3 mb-4 align-items-center">
+                        <span class="badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill"><i class="fa-solid fa-star me-1"></i><span id="hotel-rate">0</span> Sao</span>
+                        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill"><i class="fa-solid fa-thumbs-up me-1"></i><span id="hotel-review"></span></span>
+                        <span class="badge bg-success px-3 py-2 fs-6 rounded-pill" id="hotel-status">Open</span>
+                    </div>
+                    
+                    <div class="row fs-5">
+                        <div class="col-12 mb-2">
+                             <p class="hotel-info-item"><i class="fa-solid fa-location-dot"></i> <span id="hotel-address">Đang tải địa chỉ...</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="hotel-info-item"><i class="fa-solid fa-map-location-dot"></i> Khu vực: <span id="hotel-area">...</span></p>
+                        </div>
+                        <div class="col-md-6">
+                             <p class="hotel-info-item"><i class="fa-solid fa-phone-volume"></i> Hotline: <span id="hotel-hotline">...</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 d-flex flex-column justify-content-end align-items-lg-end mt-4 mt-lg-0">
+                    <div class="text-white text-lg-end mb-3">
+                        <small>Giá chỉ từ</small>
+                        <div class="fs-2 fw-bold text-warning"><span id="hotel-price">...</span> <span class="fs-6">triệu</span></div>
+                    </div>
+                    <a href="#room-list" class="btn btn-primary btn-lg fw-bold px-4 py-3 rounded-pill shadow w-100 w-lg-auto">
+                        Chọn phòng ngay <i class="fa-solid fa-arrow-down ms-2"></i>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- Danh sách phòng -->
-        <div id="room-list" class="mt-5">
-            <h3 class="text-center">Danh sách phòng</h3>
-            <div id="room-container" class="row"></div>
+        <div class="description-box">
+            <h3 class="fw-bold text-dark mb-3"><i class="fa-solid fa-circle-info text-primary me-2"></i>Giới thiệu về khách sạn</h3>
+            <p id="hotel-description" class="lead text-secondary mb-0" style="line-height: 1.8; text-align: justify;">
+                Đang tải mô tả chi tiết...
+            </p>
+        </div>
+
+        <div id="room-list" class="py-4">
+            <h3 class="fw-bold mb-4 ps-3 border-start border-5 border-danger text-dark">
+                Danh sách phòng khả dụng
+            </h3>
+            
+            <div id="room-container" class="row g-4">
+                <div class="text-center py-5 col-12">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <p class="mt-3 fs-5 text-muted">Đang tìm phòng tốt nhất cho bạn...</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Chi Tiết Phòng -->
     <div class="modal fade" id="roomDetailModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="room-title">Chi tiết phòng</h5>
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header py-3 px-4">
+                    <h4 class="modal-title fw-bold text-primary" id="room-title">Chi tiết phòng</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <img id="room-img" class="img-fluid mb-3" src="" alt="Room Image">
-                    <p><strong>📏 Diện tích:</strong> <span id="room-size"></span> m²</p>
-                    <p><strong>👥 Sức chứa:</strong> <span id="room-capacity"></span> người</p>
-                    <p><strong>🛏 Loại giường:</strong> <span id="room-bed"></span></p>
-                    <p><strong>🛎 Tiện nghi:</strong> <span id="room-services"></span></p>
-                    <p><strong>💰 Giá:</strong> <span id="room-price"></span> VNĐ</p>
-                    <p><strong>   Còn Trống:</strong> <span id="room-availability"></span> phòng</p>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <div class="col-lg-7 bg-light position-relative">
+                            <img id="room-img" class="modal-room-img w-100 h-100" src="" alt="Room Image" style="min-height: 400px;">
+                            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0)); pointer-events: none;"></div>
+                            <span class="position-absolute bottom-0 start-0 m-3 badge bg-dark bg-opacity-75 fs-6">
+                                <i class="fa-solid fa-expand me-1"></i> <span id="room-size"></span> m²
+                            </span>
+                        </div>
+                        
+                        <div class="col-lg-5 p-4 p-lg-5 d-flex flex-column">
+                            <h3 class="fw-bold mb-4" id="modal-room-name">Tên Phòng</h3>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3 text-secondary fs-5">
+                                    <i class="fa-solid fa-user-group text-primary me-3" style="width:25px"></i> 
+                                    <span>Sức chứa: <strong><span id="room-capacity"></span> người</strong></span>
+                                </div>
+                                <div class="d-flex align-items-center mb-3 text-secondary fs-5">
+                                    <i class="fa-solid fa-bed text-primary me-3" style="width:25px"></i> 
+                                    <span>Giường: <strong><span id="room-bed"></span></strong></span>
+                                </div>
+                                <div class="d-flex align-items-start mb-3 text-secondary fs-5">
+                                    <i class="fa-solid fa-bell-concierge text-primary me-3 mt-1" style="width:25px"></i> 
+                                    <div>
+                                        <div class="fw-bold mb-1 text-dark">Tiện nghi:</div>
+                                        <span id="room-services" class="fs-6"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto bg-light p-4 rounded-3 border">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Tình trạng:</span>
+                                    <span class="fw-bold text-success">
+                                        <i class="fa-solid fa-check-circle me-1"></i> Còn <span id="room-availability"></span> phòng
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <span class="text-muted">Giá mỗi đêm:</span>
+                                    <span class="fs-2 fw-bold text-danger"><span id="room-price"></span> ₫</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light px-4 py-3">
+                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary px-5 fw-bold rounded-pill shadow-sm" id="btn-confirm-select">
+                        CHỌN PHÒNG NÀY
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <footer class="main-footer mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4 company-info">
+                    <div class="text-center text-md-start">
+                        <i class="fa-solid fa-hotel me-2"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Công ty TNHH Du lịch và Dịch vụ HotelBooking</h5>
+                    <p>Số nhà 25, ngõ 276, đường Minh Khai, Xã An Khánh, TP. Hà Nội</p>
+                    <p>Mã số doanh nghiệp: 0110376372 do Sở Kế hoạch và Đầu tư Thành phố Hà Nội cấp ngày 05/06/2023</p>
+                    <p class="mt-3"><i class="fa-solid fa-phone me-2 text-primary"></i> 0392203920</p>
+                    <p><i class="fa-solid fa-envelope me-2 text-primary"></i> contact@hotelbooking.vn</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="footer-heading">GIỚI THIỆU</h6>
+                    <ul class="footer-links">
+                        <li><a href="/BLOG/about.html">Về chúng tôi</a></li>
+                        <li><a href="/BLOG/terms.html">Điều khoản và điều kiện</a></li>
+                        <li><a href="/BLOG/privacy.html">Chính sách riêng tư</a></li>
+                        <li><a href="/BLOG/guide.html">Hướng dẫn sử dụng</a></li>
+                        <li><a href="/BLOG/payment.html">Hình thức thanh toán</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="footer-heading">ĐIỂM ĐẾN</h6>
+                    <ul class="footer-links">
+                        <li><a href="/BLOG/hanoi.html">Hà Nội</a></li>
+                        <li><a href="/BLOG/thanhhoa.html">Thanh Hóa</a></li>
+                        <li><a href="/BLOG/tphcm.html">Thành phố Hồ Chí Minh</a></li>
+                        <li><a href="/BLOG/danang.html">Đà Nẵng</a></li>
+                        <li><a href="/BLOG/phuquoc.html">Phú Quốc</a></li>
+                        <li><a href="/BLOG/vungtau.html">Vũng Tàu</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="footer-heading">CÂU HỎI THƯỜNG GẶP</h6>
+                    <ul class="footer-links">
+                        <li><a href="/BLOG/blog.html">Blog du lịch</a></li>
+                        <li><a href="/BLOG/terms.html">Quy định chung và lưu ý</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center pt-4 mt-4 border-top border-secondary-subtle">
+                <p class="mb-0 small text-muted">&copy; 2024 HotelBooking. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let currentRoomId = null; // Biến tạm để lưu ID phòng khi mở modal
+
         function getHotelIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get("hotel_id");
@@ -75,13 +357,6 @@
 
         async function fetchHotelDetails() {
             const hotelId = getHotelIdFromUrl();
-            if (hotelId) {
-                console.log(hotelId); 
-            } else {
-                console.error("Không có hotelid");
-                return;
-            }
-        
             const apiUrl = `https://api.ducmanhsuncloud.click/hotels/${hotelId}`;
         
             try {
@@ -89,19 +364,27 @@
                 let hotel = await response.json();
         
                 document.getElementById("hotel-name").textContent = hotel.name;
-                document.getElementById("hotel-address").textContent = hotel.address || "Không có thông tin";
-                document.getElementById("hotel-hotline").textContent = hotel.hotline || "Không có thông tin";
-                document.getElementById("hotel-area").textContent = hotel.area || "Không xác định";
+                document.getElementById("hotel-address").textContent = hotel.address || "Đang cập nhật";
+                document.getElementById("hotel-hotline").textContent = hotel.hotline || "Đang cập nhật";
+                document.getElementById("hotel-area").textContent = hotel.area || "Đang cập nhật";
+                
+                // Background image applied to #hotel-details
                 document.getElementById("hotel-details").style.backgroundImage = `url('${hotel.image_url}')`;
-                console.log(hotel.image_url)
-                document.getElementById("hotel-rate").textContent = hotel.rate || "Chưa có";
-                document.getElementById("hotel-price").textContent = hotel.hotel_price || "Không rõ";
-                document.getElementById("hotel-status").textContent = hotel.status || "Không rõ";
-                document.getElementById("hotel-description").textContent = hotel.description || "Không có mô tả.";
-                document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Chưa có";
+                
+                document.getElementById("hotel-rate").textContent = hotel.rate || "0";
+                document.getElementById("hotel-price").textContent = hotel.hotel_price || "?";
+                document.getElementById("hotel-status").textContent = hotel.status || "Open";
+                
+                // Load description into the separate box
+                document.getElementById("hotel-description").textContent = hotel.description || "Khách sạn này chưa có mô tả chi tiết.";
+                
+                document.getElementById("hotel-review").textContent = hotel.review_score ? hotel.review_score + " / 10" : "Mới";
+                
                 fetchRoomTypes(hotelId);  
             } catch (error) {
                 console.error("Lỗi tải dữ liệu khách sạn:", error);
+                document.getElementById("hotel-name").textContent = "Không thể tải dữ liệu";
+                document.getElementById("hotel-details").style.backgroundColor = "#343a40";
             }
         }
 
@@ -111,10 +394,10 @@
             try {
                 let response = await fetch(roomApiUrl);
                 let rooms = await response.json();
-
                 displayRooms(rooms);
             } catch (error) {
                 console.error("Lỗi tải thông tin phòng:", error);
+                document.getElementById("room-container").innerHTML = "<p class='text-danger text-center col-12'>Lỗi tải danh sách phòng.</p>";
             }
         }
 
@@ -122,23 +405,50 @@
             const roomContainer = document.getElementById("room-container");
             roomContainer.innerHTML = "";
 
+            if (rooms.length === 0) {
+                roomContainer.innerHTML = "<div class='col-12 text-center py-5'><i class='fa-solid fa-hotel fa-3x text-muted mb-3'></i><p class='fs-5 text-muted'>Hiện khách sạn này chưa có phòng nào khả dụng.</p></div>";
+                return;
+            }
+
             rooms.forEach(room => {
                 let roomCard = document.createElement("div");
-                roomCard.classList.add("col-md-4");
+                roomCard.classList.add("col-md-6", "col-lg-4"); 
+
+                const formattedPrice = Number(room.price).toLocaleString('vi-VN');
 
                 roomCard.innerHTML = `
-                    <div class="card room-card shadow-sm">
-                        <img src="${room.img_url || 'default-room.jpg'}" class="room-img" alt="${room.name}">
-                        <div class="room-info">
-                            <h5>${room.name}</h5>
-                            <p><strong>Giá:</strong> ${room.price} VNĐ</p>
-                            <p><strong>Còn trống:</strong> ${room.availability} phòng</p>
-                            <button class="btn btn-info" onclick="viewRoomDetails(${room.id})">Xem chi tiết</button>
-                            <button class="btn btn-success" onclick="selectRoom(${room.id})">Chọn</button>
+                    <div class="card room-card h-100">
+                        <div class="position-relative">
+                            <img src="${room.img_url || 'https://via.placeholder.com/400x250?text=No+Image'}" class="room-img card-img-top" alt="${room.name}">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-light text-dark shadow-sm fw-bold">
+                                    <i class="fa-solid fa-door-open text-success"></i> Còn ${room.availability} phòng
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column p-4">
+                            <h4 class="card-title fw-bold text-dark mb-3">${room.name}</h4>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-end mb-4 pt-3 border-top">
+                                    <span class="text-muted fw-medium">Giá 1 đêm:</span>
+                                    <div class="text-end">
+                                        <span class="room-price fs-3">${formattedPrice}</span> <small class="text-danger fw-bold">VND</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary fw-bold py-2 rounded-pill" onclick="viewRoomDetails(${room.id})">
+                                        <i class="fa-solid fa-circle-info me-2"></i> Xem chi tiết
+                                    </button>
+                                    <button class="btn btn-primary fw-bold py-2 rounded-pill shadow-sm" onclick="selectRoom(${room.id})">
+                                        Đặt ngay <i class="fa-solid fa-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
-
                 roomContainer.appendChild(roomCard);
             });
         }
@@ -150,47 +460,85 @@
                 let response = await fetch(apiUrl);
                 let room = await response.json();
 
+                currentRoomId = roomId; // Lưu ID để dùng cho nút chọn trong modal
+
                 document.getElementById("room-title").textContent = room.name;
-                document.getElementById("room-img").src = room.img_url || "default-room.jpg";
+                document.getElementById("modal-room-name").textContent = room.name;
+                document.getElementById("room-img").src = room.img_url || "https://via.placeholder.com/400x250";
                 document.getElementById("room-size").textContent = room.area;
                 document.getElementById("room-capacity").textContent = room.capacity;
                 document.getElementById("room-bed").textContent = room.bed_type;
-                document.getElementById("room-services").textContent = room.services || "Không có thông tin";
-                document.getElementById("room-price").textContent = room.price;
+                document.getElementById("room-services").textContent = room.services || "Đầy đủ tiện nghi tiêu chuẩn";
+                
+                document.getElementById("room-price").textContent = Number(room.price).toLocaleString('vi-VN');
                 document.getElementById("room-availability").textContent = room.availability;
 
                 new bootstrap.Modal(document.getElementById("roomDetailModal")).show();
             } catch (error) {
                 console.error("Lỗi lấy thông tin phòng:", error);
+                alert("Không thể tải chi tiết phòng.");
             }
         }
 
+        // Xử lý sự kiện nút "CHỌN PHÒNG NÀY" trong Modal
+        document.getElementById("btn-confirm-select").addEventListener("click", function() {
+            if (currentRoomId) {
+                selectRoom(currentRoomId);
+            }
+        });
+
         async function selectRoom(roomId) {
             try {
+                document.body.style.cursor = 'wait';
                 const apiUrl = `https://api.ducmanhsuncloud.click/roomtypes/${roomId}`;
                 let response = await fetch(apiUrl);
-                if (!response.ok) throw new Error("Không thể lấy dữ liệu phòng.");
+                if (!response.ok) throw new Error("Lỗi API");
         
                 let room = await response.json();
-                console.log(room.availability)
+                document.body.style.cursor = 'default';
+
                 if (room.availability > 0) {
                     window.location.href = `additionalservices.html?room_type_id=${roomId}`;
                 } else {
-                    alert("Phòng này đã hết, không thể chọn.");
+                    alert("Rất tiếc, phòng này vừa mới hết chỗ. Vui lòng chọn phòng khác.");
                 }
             } catch (error) {
-                console.error("Lỗi khi chọn phòng:", error);
-                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+                document.body.style.cursor = 'default';
+                console.error("Lỗi:", error);
+                alert("Đã xảy ra lỗi kết nối. Vui lòng thử lại.");
             }
         }
-        
 
         function goBack() {
             window.history.back();
         }
 
+        async function logout() {
+            const token = localStorage.getItem("access_token");
+            if (!confirm("Bạn có chắc chắn muốn đăng xuất?")) return;
+
+            try {
+                await fetch("https://api.ducmanhsuncloud.click/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ action: "Logout" })
+                });
+            } catch (err) {
+                console.error("Lỗi khi logout:", err);
+            } finally {
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("customer_id");
+                localStorage.removeItem("username");
+                localStorage.removeItem("fullnameuser");
+                localStorage.removeItem("emailuser");    
+                window.location.href = "../home.html"; 
+            }
+        }
+
         fetchHotelDetails();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
