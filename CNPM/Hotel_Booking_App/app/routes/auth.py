@@ -4,6 +4,7 @@ import mysql.connector as connect
 from db import get_db_connection
 from datetime import timedelta
 import random
+import bcrypt
 from app.utils import get_db_connection,get_old_passwords,send_email,is_new_password_valid,is_valid_password, get_userid_from_token
 from time import time
 
@@ -24,7 +25,6 @@ def register():
 
     if not is_valid_password(password):
         return jsonify({"error": "Mật khẩu phải trên 8 kí tự và chứa ít nhất 1 kí tự đặc biệt!"}),400
-    # Kiểm tra thông tin đầu vào
     if not username or not email or not password or not phone or not full_name or not citizen_id:
         return jsonify({"error": "Vui lòng nhập đầy đủ thông tin trước khi đăng ký!"}), 400
 
@@ -33,27 +33,26 @@ def register():
     cursor.execute("SELECT * FROM customers WHERE email = %s", (email,))
     user = cursor.fetchone()
 
-    # Nếu có OTP -> Xác thực OTP
     if otp_code:
         if email not in otp_storage:
             return jsonify({"error": "Email chưa yêu cầu OTP hoặc OTP đã hết hạn!"}), 400
-
         stored_data = otp_storage[email]
         if stored_data["expires"] < time():
             del otp_storage[email]
             return jsonify({"error": "OTP đã hết hạn, vui lòng thử lại!"}), 400
-
         if stored_data["otp"] != otp_code:
             return jsonify({"error": "OTP không chính xác!"}), 400
-
-        # OTP hợp lệ -> Thêm user vào database (KHÔNG HASH PASSWORD)
         try:
+            raw_password = data.get("password")
+            password_bytes = raw_password.encode('utf-8')
+            salt = bcrypt.gensalt()
+            hashed_password = bcrypt.hashpw(password_bytes, salt).decode('utf-8')
             cursor.execute("INSERT INTO customers (username, email, phone_number, password, citizen_id, full_name) VALUES (%s, %s, %s, %s, %s, %s)", 
-                           (username, email, phone, password,citizen_id, full_name))
+                           (username, email, phone, hashed_password,citizen_id, full_name))
             conn.commit()
             cursor.close()
             conn.close()
-            del otp_storage[email]  # Xóa OTP sau khi xác nhận thành công
+            del otp_storage[email]  
             return jsonify({"message": "Đăng ký thành công!"}), 201
         except connect.Error as err:
             return jsonify({"error": str(err)}), 500
@@ -61,7 +60,6 @@ def register():
     # Nếu không có OTP -> Gửi OTP
     if user:
         return jsonify({"error": "Email đã được sử dụng!"}), 400
-
     otp_code = str(random.randint(100000, 999999))
     otp_storage[email] = {"otp": otp_code, "expires": time() + 300}
 
@@ -73,13 +71,13 @@ def register():
 def login():
     data = request.json
     if not data:
-        return jsonify({"error": "Request body phải là JSON"}), 400
+        return jsonify({"error": "Thiếu dữ liệu!"}), 400
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
 
     if (username and email) or (not username and not email):
-        return jsonify({"error": "Bạn phải nhập username hoặc email, không được nhập cả hai hoặc bỏ trống"}), 400
+        return jsonify({"error": "Bạn phải nhập username hoặc email, không được nhập cả hai ô thoặc trống"}), 400
 
     identifier = username if username else email  
     field = "username" if username else "email"  
@@ -89,37 +87,40 @@ def login():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        query = f"SELECT username, password, id, role FROM customers WHERE {field} = %s"
+        query = f"SELECT username, password, id, role, full_name, email FROM customers WHERE {field} = %s"
         cursor.execute(query, (identifier,))
         user = cursor.fetchone()
-        
+        if not user:
+            return jsonify({"error": "Sai username/email hoặc password"}), 401
+        raw_password_bytes = password.encode('utf-8')
+        db_password_hash_bytes = user[1].encode('utf-8')
 
-        if user and user[1] == password:
-            access_token = create_access_token(identity=user[0],expires_delta=timedelta(hours=1))
+        if bcrypt.checkpw(raw_password_bytes, db_password_hash_bytes):
+            access_token = create_access_token(identity=user[0],expires_delta=timedelta(hours=2))
             action = "Login"
             cursor.execute("INSERT INTO log(customer_id, action) VALUES(%s,%s)",(user[2],action))
             conn.commit()
-            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2], "role": user[3]}), 200
+            return jsonify({"message": "Đăng nhập thành công", "access_token": access_token, "customer_id": user[2], "role": user[3], "fullname": user[4],"email": user[5]}), 200        
         else:
             return jsonify({"error": "Sai username/email hoặc password"}), 401
-        cursor.close()
-        conn.close()
     except connect.Error as err:
-        return jsonify({"error": str(err)}), 500  
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()  
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
     data = request.json
     email = data.get("email")
-
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM customers WHERE email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
-
     if not user:
         return jsonify({"error": "Email không tồn tại"}), 400
-
     # Tạo OTP ngẫu nhiên
     otp_code = str(random.randint(100000, 999999))
 
@@ -134,35 +135,58 @@ def reset_password():
     data = request.json
     email = data.get("email")
     otp_code = data.get("otp")
-    new_password = data.get("new_password")
-    old_passwords = get_old_passwords(email)
-    if not is_new_password_valid(new_password, old_passwords):
-        return {"error": "Mật khẩu mới không được trùng với 3 lần gần nhất"}
+    new_password = data.get("new_password") 
+
     if not email or not otp_code or not new_password:
         return jsonify({"error": "Email, OTP và mật khẩu mới không được để trống"}), 400
 
-    # Kiểm tra OTP
     if email not in otp_storage or otp_storage[email]["otp"] != otp_code:
         return jsonify({"error": "Mã OTP không hợp lệ hoặc đã hết hạn"}), 400
 
-    # Cập nhật mật khẩu
+    old_hashed_passwords = get_old_passwords(email) 
+    
+    new_pass_bytes = new_password.encode('utf-8')
+    is_reused = False
+    
+    if old_hashed_passwords:
+        for old_hash in old_hashed_passwords:
+            if old_hash and bcrypt.checkpw(new_pass_bytes, old_hash.encode('utf-8')):
+                is_reused = True
+                break
+
+    if is_reused:
+        return jsonify({"error": "Mật khẩu mới không được trùng với 3 lần gần nhất"}), 400
+
+    try:
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(new_pass_bytes, salt).decode('utf-8')
+    except Exception as e:
+        return jsonify({"error": f"Lỗi nội bộ khi xử lý mật khẩu: {e}"}), 500
+
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    current_password_hash = old_hashed_passwords[0] if old_hashed_passwords else None
+
     query = """
     UPDATE customers 
     SET 
-        password = %s, 
+        password = %s,         
         old_password_3 = old_password_2, 
         old_password_2 = old_password_1, 
-        old_password_1 = %s
+        old_password_1 = %s   
     WHERE email = %s;
     """
-    cursor.execute(query, (new_password, old_passwords[0], email))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    try:
+        cursor.execute(query, (hashed_password, current_password_hash, email))
+        conn.commit()
+    except Exception as e:
+        conn.rollback() 
+        return jsonify({"error": f"Lỗi khi cập nhật cơ sở dữ liệu: {e}"}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
-    # Xóa OTP sau khi sử dụng
     del otp_storage[email]
 
     return jsonify({"message": "Đặt lại mật khẩu thành công"}), 200

@@ -24,7 +24,6 @@ def payment_vnpay():
         total_price = Decimal(total.get("total_price"))
     else:
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
-    print(total_price,pay_money)
     if abs(total_price - pay_money) < Decimal(0.01):
         cursor.execute("INSERT INTO payment (invoices_id,total_money,pay_description,type_of_payment,card_number,card_type) VALUES  (%s,%s,%s,%s,%s,%s)",(invoices_id,pay_money,pay_description,type_of_payment,number,card_type))
         conn.commit()
@@ -44,7 +43,6 @@ def payment_card():
     card_type = data.get("card_type")
     pay_money = Decimal(data.get("total_money"))  
     pay_description = data.get("description")
-    print(pay_money)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -53,10 +51,8 @@ def payment_card():
     
     if total:
         total_price = Decimal(total.get("total_price"))  
-        print(total_price)
     else:
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
-    print(abs(total_price-pay_money))
     if abs(total_price - pay_money) < Decimal(0.01):
         cursor.execute("INSERT INTO payment (invoices_id, total_money, pay_description, type_of_payment, card_number, card_type) VALUES  (%s, %s, %s, %s, %s, %s)", 
                        (invoices_id, pay_money, pay_description, type_of_payment, card_number, card_type))
@@ -86,8 +82,7 @@ def payment_banking():
     total = cursor.fetchone()
     
     if total:
-        total_price = Decimal(total.get("total_price"))  # Chuyển total_price thành Decimal
-        print(total_price)
+        total_price = Decimal(total.get("total_price"))  
     else:
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
     

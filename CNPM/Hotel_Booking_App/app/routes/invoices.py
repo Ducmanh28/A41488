@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from db import get_db_connection
 from decimal import Decimal
-from app.utils import get_userid_from_token, get_hotel_id_from_room_id, get_service_id, format_rfc1123_to_date
-from datetime import datetime
+from app.utils import get_userid_from_token, get_hotel_id_from_room_id, get_service_id, format_rfc1123_to_date, send_booking_confirmation_email,get_roomtypes_id_from_invoice
+from datetime import datetime, timedelta
 import mysql.connector as connect
 
 invoices_bp = Blueprint("invoices", __name__)
@@ -28,10 +28,28 @@ def create_invoices():
     if check_in >= check_out:
         return jsonify({"error": "Ngày check-in phải trước ngày check-out"}), 400
 
+    if check_in < datetime.now().strftime("%Y-%m-%d"):
+        return jsonify({"error": "Ngày check-in phải từ ngày hiện tại trở đi"}), 400
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-
+        # Lấy tên và email khách hàng
+        cursor.execute("SELECT email, full_name FROM customers WHERE id = %s", (customer_id,))
+        customer_info = cursor.fetchone()
+        if not customer_info:
+             return jsonify({"error": "Không tìm thấy thông tin khách hàng"}), 400
+        customer_email, customer_name = customer_info
+        # Lấy thông tin chi tiết Khách sạn và Tên loại phòng
+        cursor.execute("""
+            SELECT h.name, h.address, h.hotline, rt.name 
+            FROM hotels h
+            JOIN roomtypes rt ON h.id = rt.hotel_id
+            WHERE h.id = %s AND rt.id = %s
+        """, (hotel_id, room_type_id))
+        hotel_room_info = cursor.fetchone()
+        if not hotel_room_info:
+            return jsonify({"error": "Không tìm thấy thông tin khách sạn/phòng"}), 400
+        hotel_name, hotel_address, hotel_hotline, room_type_name = hotel_room_info
         # Lấy giá phòng
         cursor.execute("SELECT price, availability FROM roomtypes WHERE id = %s", (room_type_id,))
         room_info = cursor.fetchone()
@@ -68,14 +86,11 @@ def create_invoices():
             total_service_price = sum(row[1] for row in services)
         check_in_date = datetime.strptime(check_in, "%Y-%m-%d")
         check_out_date = datetime.strptime(check_out, "%Y-%m-%d")
-        print(check_in_date,check_out_date)
         if not check_in_date:
             print("Không có giá trị check_in_date")
         num_nights = (check_out_date - check_in_date).days
-        print(num_nights)
         # Tổng tiền
         total_price = Decimal(room_price*num_nights + total_service_price)
-        print(total_price)
         total_price -= (Decimal(discount) / 100) * total_price
         cursor.execute("SELECT room_number FROM busy_room WHERE hotel_id=%s AND room_type_id=%s AND state='Free'",(hotel_id,room_type_id))
         rooms = cursor.fetchall()
@@ -93,14 +108,11 @@ def create_invoices():
         invoice_id = cursor.lastrowid
         cursor.execute("UPDATE busy_room SET state='Busy',busy_from=%s,busy_to=%s,invoice_id=%s WHERE hotel_id=%s AND room_type_id=%s AND room_number=%s",(check_in_date,check_out_date,invoice_id,hotel_id,room_type_id,room))
         conn.commit()
-        # Gán dịch vụ bổ sung
         for service_id in service_ids:
             cursor.execute("""
                 INSERT INTO invoice_additionalservices (invoice_id, service_id)
                 VALUES (%s, %s)
             """, (invoice_id, service_id))
-
-        # Trừ số lượng phòng còn lại
         cursor.execute("""
             UPDATE roomtypes SET availability = availability - 1 WHERE id = %s
         """, (room_type_id,))
@@ -108,16 +120,36 @@ def create_invoices():
         action = "CREATE INVOICE"
         cursor.execute("INSERT INTO log(customer_id,action) VALUES(%s,%s)",(customer_id,action))
         conn.commit()
+        try:
+            free_cancel_dt = check_in_date - timedelta(days=2)
+            
+            email_data = {
+                "invoice_id": invoice_id,
+                "customer_name": customer_name, 
+                "guest_name": anothercustomer if forwho else customer_name, # Tên người ở
+                "hotel_name": hotel_name,
+                "hotel_address": hotel_address,
+                "hotel_phone": hotel_hotline,
+                "room_type_name": room_type_name,
+                "check_in": check_in_date.strftime("%d/%m/%Y"),
+                "check_out": check_out_date.strftime("%d/%m/%Y"),
+                "duration": num_nights,
+                "total_price": total_price,
+                "discount": discount,
+                "free_cancel_date": free_cancel_dt.strftime("%d/%m/%Y")
+            }
+            send_booking_confirmation_email(customer_email, email_data)
+            
+        except Exception as email_err:
+            print(f"Lỗi gửi email xác nhận: {email_err}")
         return jsonify({
             "message": "Đặt phòng thành công",
             "invoice_id": invoice_id,
             "total_price": float(total_price)
         }), 201
-
     except connect.Error as err:
         conn.rollback()
         return jsonify({"error": str(err)}), 500
-
     finally:
         cursor.close()
         conn.close()
@@ -167,7 +199,7 @@ def updated_invoicess(invoices_id):
             "UPDATE invoices SET check_in = %s, check_out = %s, total_price = %s, state = %s WHERE id = %s",
             (check_in, check_out, new_total, new_state, invoices_id)
         )
-
+        cursor.execute("UPDATE busy_room SET busy_from=%s, busy_to=%s WHERE invoice_id=%s",(check_in,check_out,invoices_id))
         # Cập nhật dịch vụ đi kèm
         cursor.execute("DELETE FROM invoice_additionalservices WHERE invoice_id = %s", (invoices_id,))
         
@@ -189,17 +221,43 @@ def updated_invoicess(invoices_id):
     finally:
         cursor.close()
         conn.close()
-@invoices_bp.route("/invoices/<int:invoices_id>",methods=["DELETE"])
+@invoices_bp.route("/invoices/<int:invoices_id>", methods=["DELETE"])
 @jwt_required()
 def delete_invoices(invoices_id):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("DELETE FROM invoices WHERE id = %s",(invoices_id, ))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    return jsonify({"message": "Invoices deleted successfully"}), 201
+    conn = None
+    cursor = None
+    room_type_id = get_roomtypes_id_from_invoice(invoices_id)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("DELETE FROM invoice_additionalservices WHERE invoice_id = %s", (invoices_id,))
+
+        cursor.execute("UPDATE busy_room SET state='Free',busy_from=NULL, busy_to=NULL, invoice_id=NULL WHERE invoice_id = %s", (invoices_id,))
+
+        cursor.execute("UPDATE invoices SET state='DA BI HUY' WHERE id = %s", (invoices_id,))
+        
+        cursor.execute("""
+            UPDATE roomtypes SET availability = availability + 1 WHERE id = %s
+        """, (room_type_id,))
+
+        conn.commit()
+        
+        return jsonify({"message": "Invoices deleted successfully"}), 200
+
+    except Exception as e:
+        # Nếu có lỗi, hoàn tác mọi thay đổi để tránh dữ liệu rác
+        if conn:
+            conn.rollback()
+        print(f"Lỗi: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        # BƯỚC 5: LUÔN LUÔN ĐÓNG KẾT NỐI (Quan trọng nhất để tránh lỗi Lock Timeout)
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 @invoices_bp.route("/invoices/<int:invoices_id>",methods=["GET"])
 @jwt_required()
 def get_invoices_by_id(invoices_id):

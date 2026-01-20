@@ -5,16 +5,6 @@ from app.utils import get_userid_from_token,format_rfc1123_to_date
 customers_bp = Blueprint("customers", __name__)
 
 
-@customers_bp.route("/customers",methods=["GET"])
-@jwt_required()
-def get_all_users():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM customers")
-    users = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify(users)
 @customers_bp.route("/customers/<int:user_id>",methods=["GET"])
 @jwt_required()
 def get_users(user_id):
@@ -37,7 +27,6 @@ def updated_users(user_id):
     fields = []
     values = []
 
-    # Duyệt qua các trường dữ liệu
     if "username" in data:
         fields.append("username = %s")
         values.append(data["username"])
@@ -60,11 +49,9 @@ def updated_users(user_id):
         fields.append("current_address = %s")
         values.append(data["current_address"])
 
-    # Nếu không có trường nào để cập nhật, trả về lỗi
     if not fields:
         return jsonify({"error": "Không có thông tin nào để cập nhật"}), 400
 
-    # Ghép câu lệnh SQL
     query = f"UPDATE customers SET {', '.join(fields)} WHERE id = %s"
     values.append(user_id)
     try:
@@ -93,7 +80,6 @@ def deleted_users(user_id):
 def get_customer_info():
     customer_id = get_userid_from_token()
     if customer_id:
-    # Truy vấn thông tin từ database
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM customers WHERE id = %s", (customer_id,))

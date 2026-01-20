@@ -22,22 +22,31 @@ def get_all_hotels():
     conn.close()
 
     return jsonify(hotels)
+@hotels_bp.route("/hotels/5_stars",methods=["GET"])
+def get_5_stars_hotels():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM hotels WHERE rate = 5")
+    hotels = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(hotels)
 @hotels_bp.route("/hotels/find", methods=["POST"])
 def find_hotel():
     data = request.json
+    if not data:
+        return jsonify({"error": "Thiếu dữ liệu!"}), 400
     area = data.get("area")
     check_in = data.get("check_in")
     check_out = data.get("check_out")
-    status = "Available"  # Trạng thái phòng phải là "Free"
+    status = "Available"  
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Lấy danh sách khách sạn theo khu vực
     cursor.execute("SELECT * FROM hotels WHERE area = %s AND status = %s", (area, status))
     hotels = cursor.fetchall()
 
-    # Danh sách khách sạn có phòng trống
     available_hotels = []
 
     for hotel in hotels:
@@ -59,7 +68,6 @@ def find_hotel():
         # Lấy tổng số phòng của khách sạn
         cursor.execute("SELECT COUNT(room_number) as total_rooms FROM busy_room WHERE hotel_id = %s", (hotel_id,))
         total_rooms = cursor.fetchone()["total_rooms"]
-        print(total_rooms)
         # Nếu tất cả các phòng đều bận trong khoảng thời gian check_in -> check_out, không thêm khách sạn vào danh sách
         if busy_room_count < total_rooms:
             available_hotels.append(hotel)
@@ -112,5 +120,34 @@ def get_name_of_roomtype(room_type_id):
     cursor.close()
     conn.close()
     return jsonify(name)
-
-
+@hotels_bp.route("/hotels/areas",methods=["GET"])
+def get_areas():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT area FROM hotels")
+    areas = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    area_list = [area[0] for area in areas]
+    return jsonify(area_list)
+@hotels_bp.route("/hotels/prices", methods=["POST"])
+def get_hotels_by_price():
+    data = request.json
+    hotel_price = data.get("hotel_price")
+    area = data.get("area")
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM hotels WHERE hotel_price = %s and area = %s",(hotel_price,area, ))
+    hotels = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(hotels)
+@hotels_bp.route("/hotels/prices", methods=["GET"])
+def get_all_prices():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT DISTINCT hotel_price FROM hotels")
+    prices = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(prices)

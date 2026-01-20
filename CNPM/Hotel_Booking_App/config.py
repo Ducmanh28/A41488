@@ -20,3 +20,4 @@ class Config:
     SENDER_EMAIL = os.getenv("SENDER_EMAIL")
     APP_PASSWORD = os.getenv("APP_PASSWORD")
     URL = os.getenv("URL")
+    API_KEY = os.getenv("API_KEY")
