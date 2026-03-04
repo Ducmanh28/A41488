@@ -21,3 +21,6 @@ class Config:
     APP_PASSWORD = os.getenv("APP_PASSWORD")
     URL = os.getenv("URL")
     API_KEY = os.getenv("API_KEY")
+    API_URL = os.getenv("API_URL")
+    IP = os.getenv("IP")
+    URL = os.getenv("URL")

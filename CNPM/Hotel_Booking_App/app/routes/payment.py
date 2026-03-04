@@ -86,8 +86,7 @@ def payment_banking():
     else:
         return jsonify({"message": "Lỗi lấy dữ liệu giá"})
     
-    # Kiểm tra sự khác biệt giữa 70% giá trị total_price và pay_money
-    if abs(total_price - pay_money) < Decimal(0.01):  # Sử dụng Decimal cho phép toán
+    if abs(total_price - pay_money) < Decimal(0.01): 
         cursor.execute("INSERT INTO payment (invoices_id, total_money, pay_description, type_of_payment, card_number, card_type) VALUES  (%s, %s, %s, %s, %s, %s)", 
                        (invoices_id, pay_money, pay_description, type_of_payment, card_number, card_type))
         conn.commit()

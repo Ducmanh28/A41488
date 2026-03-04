@@ -258,7 +258,7 @@
             </select>
           </div>
           <div style="width: 100px;">
-            <input type="number" class="form-control form-control-sm" id="report-year" value="2025" min="2000" max="2100">
+            <input type="number" class="form-control form-control-sm" id="report-year" value="2025" min="2000" max="2026">
           </div>
           <button class="btn btn-success btn-sm" onclick="loadReport()">
             <i class="bi bi-filter"></i> Tìm kiếm
@@ -279,7 +279,6 @@
     const admin_Id = localStorage.getItem("customer_id");
     let reportChart;
 
-    // 1. Format Currency Helper
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     };
@@ -289,8 +288,6 @@
     document.getElementById("today-date").innerText = today.toLocaleDateString("vi-VN", { 
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
-
-    // 3. Load All Data using Promise.all (Faster)
     async function loadInitialData() {
       if (!token) {
         alert("Vui lòng đăng nhập!");
@@ -335,7 +332,6 @@
       }
     }
 
-    // 4. Load Report Chart
     function loadReport() {
       const type = document.getElementById('report-type').value;
       const range = document.getElementById('report-range').value;
@@ -365,7 +361,7 @@
         gradient.addColorStop(1, 'rgba(25, 135, 84, 0.05)');
 
         reportChart = new Chart(ctx, {
-          type: "bar", // Hoặc 'line' cho doanh thu
+          type: "bar", 
           data: {
             labels: data.labels,
             datasets: [{

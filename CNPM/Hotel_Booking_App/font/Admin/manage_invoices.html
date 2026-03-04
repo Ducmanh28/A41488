@@ -322,9 +322,9 @@
               <div class="col-md-4">
                 <label class="form-label small text-muted">Trạng thái</label>
                 <select id="edit-invoicestate" class="form-select">
-                    <option value="Unpaid">Unpaid</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="CHUA THANH TOAN">Chưa thanh toán</option>
+                    <option value="DA THANH TOAN">Đã thanh toán</option>
+                    <option value="DA BI HUY">Đã bị hủy</option>
                 </select>
               </div>
               <div class="col-md-6">
@@ -678,7 +678,6 @@
         } catch(e) { roomSelect.innerHTML = '<option value="">Lỗi tải phòng</option>'; }
     };
 
-    // Load Services for Create Modal
     async function loadCreateServices() {
         const res = await fetch(`${API_URL}/additionalservices`);
         const services = await res.json();
@@ -694,22 +693,18 @@
         });
     }
 
-    // Toggle "Other Person" Inputs
     document.getElementById("forWhoSelect").onchange = function() {
         document.getElementById("otherPersonInfo").style.display = (this.value === "True") ? "flex" : "none";
     };
 
-    // Submit Create Form
     document.getElementById("createServiceForm").addEventListener("submit", async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
         
-        // Handle Services Array
         data.additional_services = [];
         document.querySelectorAll("#ServiceCheckboxGroup input:checked").forEach(cb => data.additional_services.push(cb.value));
         
-        // Handle Booleans/Nulls
         data.forwho = (data.forwho === "True");
         if(!data.forwho) { data.anothercustomer = null; data.anotherccid = null; }
 
@@ -720,13 +715,16 @@
                 body: JSON.stringify(data)
             });
             const result = await res.json();
+            if (!res.ok) {
+              alert("Tạo thất bại: " + (result.error || result.message));
+              return;
+            }
             alert(result.message || "Tạo thành công");
             await logAction("Create Invoice");
             location.reload();
         } catch(err) { alert("Lỗi tạo: " + err.message); }
     });
 
-    // Submit Edit Form
     document.getElementById("editInvoiceForm").addEventListener("submit", async function(e) {
         e.preventDefault();
         const id = document.getElementById("edit-invoice-id").value;

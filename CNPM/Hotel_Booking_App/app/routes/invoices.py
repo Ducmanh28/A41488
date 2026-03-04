@@ -33,13 +33,11 @@ def create_invoices():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # Lấy tên và email khách hàng
         cursor.execute("SELECT email, full_name FROM customers WHERE id = %s", (customer_id,))
         customer_info = cursor.fetchone()
         if not customer_info:
              return jsonify({"error": "Không tìm thấy thông tin khách hàng"}), 400
         customer_email, customer_name = customer_info
-        # Lấy thông tin chi tiết Khách sạn và Tên loại phòng
         cursor.execute("""
             SELECT h.name, h.address, h.hotline, rt.name 
             FROM hotels h
@@ -50,7 +48,6 @@ def create_invoices():
         if not hotel_room_info:
             return jsonify({"error": "Không tìm thấy thông tin khách sạn/phòng"}), 400
         hotel_name, hotel_address, hotel_hotline, room_type_name = hotel_room_info
-        # Lấy giá phòng
         cursor.execute("SELECT price, availability FROM roomtypes WHERE id = %s", (room_type_id,))
         room_info = cursor.fetchone()
         if not room_info:
@@ -60,7 +57,6 @@ def create_invoices():
         if availability <= 0:
             return jsonify({"error": "Loại phòng đã hết chỗ"}), 400
 
-        # Lấy mức giảm giá khách hàng
         cursor.execute("""
             SELECT d.discount FROM customers c
             JOIN discounts d ON c.customer_type = d.id
@@ -69,7 +65,6 @@ def create_invoices():
         discount = cursor.fetchone()
         discount = float(discount[0]) if discount else 0
 
-        # Tính giá dịch vụ bổ sung
         total_service_price = 0
         service_ids = []
         if additional_services:
@@ -89,13 +84,11 @@ def create_invoices():
         if not check_in_date:
             print("Không có giá trị check_in_date")
         num_nights = (check_out_date - check_in_date).days
-        # Tổng tiền
         total_price = Decimal(room_price*num_nights + total_service_price)
         total_price -= (Decimal(discount) / 100) * total_price
         cursor.execute("SELECT room_number FROM busy_room WHERE hotel_id=%s AND room_type_id=%s AND state='Free'",(hotel_id,room_type_id))
         rooms = cursor.fetchall()
         room = rooms[0][0]
-        # Insert hóa đơn
         cursor.execute("""
             INSERT INTO invoices (
                 customer_id, room_type_id, check_in, check_out, total_price, hotel_id,

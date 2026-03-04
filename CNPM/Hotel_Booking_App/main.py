@@ -1,7 +1,5 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
-import logging
-from logging.handlers import RotatingFileHandler
 from config import Config
 from app.routes.auth import auth_bp
 from app.routes.users import customers_bp
@@ -28,4 +26,4 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(help_bp)
 
 if __name__ == "__main__":
-    app.run(host="172.168.68.68", port=5000, debug=True)
+    app.run(host="172.168.66.82", port=5000, debug=True)

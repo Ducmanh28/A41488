@@ -359,16 +359,13 @@
         });
         const schedules = await response.json();
 
-        // Optimized: Fetch Names for all schedules in parallel
         const schedulesWithNames = await Promise.all(schedules.map(async (schedule) => {
             try {
-                // Sử dụng API get_name (đã có từ Invoice) để lấy tên khách sạn và phòng
-                // Lưu ý: API này cần room_type_id và hotel_id
                 const nameRes = await fetch(`${API_URL}/admin/invoices/get_name`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                     body: JSON.stringify({ 
-                        customer_id: 0, // Không cần thiết cho schedule nhưng API yêu cầu
+                        customer_id: 0, 
                         hotel_id: schedule.hotel_id, 
                         room_type_id: schedule.room_type_id 
                     })
@@ -414,10 +411,8 @@
           if (!response.ok) throw new Error("Lỗi tìm kiếm");
           
           let schedules = await response.json();
-          // API trả về mảng hoặc object
           let schedulesArray = Array.isArray(schedules) ? schedules : [schedules];
 
-          // Fetch names for search results too
           const schedulesWithNames = await Promise.all(schedulesArray.map(async (schedule) => {
                 try {
                     const nameRes = await fetch(`${API_URL}/admin/invoices/get_name`, {

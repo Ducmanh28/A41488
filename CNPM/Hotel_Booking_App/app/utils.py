@@ -185,7 +185,6 @@ Trân trọng,
         msg["From"] = Config.SENDER_EMAIL
         msg["To"] = receiver_email
 
-        # 3. Kết nối SMTP (Dùng SSL - Port 465)
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(Config.SMTP_SERVER, Config.SMTP_PORT, context=context) as server:
             server.login(Config.SENDER_EMAIL, Config.APP_PASSWORD)
